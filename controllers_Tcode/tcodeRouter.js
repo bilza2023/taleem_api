@@ -37,7 +37,7 @@ TcodeRouter.post("/update" , async function(req,res) {
   //  const options = { new: false, upsert: false };
    const tf  = await theMdl.update(question);
       if (tf   ){
-        return res.status(200).json({ message: 'success' });
+        return res.status(200).json({ ok:true, message: 'success' });
       }else {
         return res.status(404).json({ message: "failed to save" });
       }
@@ -47,8 +47,232 @@ TcodeRouter.post("/update" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/create" , async function(req,res) {
+  try {
+  debugger;
+  /////////////////////////////////////
+      // const verifyResp = verify(req); 
+      // if(!verifyResp.ok){
+      // return res.status(400).json({message:verifyResp.message})
+      // }/////////////////////////////////////
+  const question = req.body.question;
+  // const id  = presentation._id;
+  const tcode  = req.body.tcode;
+  
+  if (!question || !tcode) {return  res.status(400).json({ message: "missing data" }); }
+  
+  const theMdl = await getTcode(tcode);
+  // const theMdl = await getModel(tcode);
+  if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+
+  /////////////////////////////////////////////////////////////////////////
+  const result = await theMdl.addQuestion(tcode,question);
+  if(result.ok){
+      return res.status(200).json(result);
+    }else {
+      return res.status(500).json(result);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+  } catch(error) {
+    return res.status(400).json({message : 'unknown error!'  });
+  }
+});
+////////////////////////////////////////////////////////
 TcodeRouter.post("/read" , async function(req,res) {
  return read(req,res);
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/where" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   const query  = req.body.query;
+   if (!query || !tcode) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = theMdl.where(query);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+  
+});
+////////////////////////////////////////////////////////
+TcodeRouter.post("/count" , async function(req,res) {
+ try{
+  
+   const tcode  = req.body.tcode;
+   const query  = req.body.query || {};
+   if (!query || !tcode) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   debugger;
+   const result = await theMdl.count(query);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getUniqueChapters" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   if (!tcode) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getUniqueChapters();
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getUniqueExercises" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   if (!tcode) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getUniqueExercises();
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getByStatus" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   const status  = req.body.status;
+   if (!tcode || !status) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getByStatus(status);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getByQuestionType" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   const questionType  = req.body.questionType;
+   if (!tcode || !questionType) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getByQuestionType(questionType);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getChapter" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   const chapterNumber  = req.body.chapterNumber;
+   if (!tcode || !chapterNumber) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getChapter(chapterNumber);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
+////////////////////////////////////////////////////////
+TcodeRouter.post("/getExercise" , async function(req,res) {
+ try{
+   const tcode  = req.body.tcode;
+   const exerciseName  = req.body.exerciseName;
+   if (!tcode || !exerciseName) {return  res.status(400).json({ message: "missing data" }); }
+  
+   const theMdl = await getTcode(tcode);
+   // const theMdl = await getModel(tcode);
+   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+ 
+   /////////////////////////////////////////////////////////////////////////
+   const result = await theMdl.getExercise(exerciseName);
+   if(result.ok){
+       return res.status(200).json(result);
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
 });
 ////////////////////////////////////////////////////////
 

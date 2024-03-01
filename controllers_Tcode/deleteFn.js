@@ -27,8 +27,8 @@ async function deleteFn(req, res) {
                   return res.status(400).json({message : "question has content"});
            }
            
-           await theMdl.findByIdAndRemove(objectId );    
-           return res.status(200).json({message : 'question deleted'  });
+           const delete_result = await theMdl.findByIdAndRemove(objectId );    
+           return res.status(200).json({ok:true, message : 'question deleted',delete_result  });
             
         } catch(error) {
           return res.status(400).json({msg : 'unknown error!'  });

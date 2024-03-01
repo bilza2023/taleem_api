@@ -32,7 +32,7 @@
     "nodemailer": "^6.9.8",
     "sequelize": "6.28.0",
     "sqlite3": "^5.1.4",
-    "tcode_module": "^0.0.6",
+    "tcode_module": "github:bilza2023/tcode_module",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

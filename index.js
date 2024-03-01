@@ -43,14 +43,14 @@ app.post('/login',async (req,res)=>{
 // });
 ///////////////////////////Routes////////////////////////
 app.get('/', async (req, res) =>{
-res.status(500).json({success :true ,  message : "Welcome to BackOffice API"});
+res.status(500).json({success :true ,  message : "Welcome to Taleem API"});
 });
 ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 db.once('open',()=> {
-    debugger;
+    // debugger;
     console.log("MongoDb ===> connection established")
-    registerTcode([ DB_NAME ]);
+    registerTcode([ DB_NAME , "testtable"]);
     app.listen(PORT, ()=>{console.log(`listening on port ${PORT}`)});
 });
 ///////////////////////////////////////////////////////////////////////
