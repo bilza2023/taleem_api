@@ -4,7 +4,7 @@ const express  =require('express');
 const cors = require('cors');
 // const mongoose = require('mongoose');
 const db = require("./mongoDb/mongo.js");
-const DB_NAME = "fbise9math"
+
 const {getTcode,registerTcode} = require('tcode_module');
 const signup = require('./controllers/signup.js')
 const login = require('./controllers/login.js')
@@ -50,7 +50,19 @@ res.status(500).json({success :true ,  message : "Welcome to Taleem API"});
 db.once('open',()=> {
     // debugger;
     console.log("MongoDb ===> connection established")
-    registerTcode([ DB_NAME , "testtable"]);
+    registerTcode([ 
+        "fbise9math" , 
+        "fbise10math" ,
+        
+        "fbise9english" ,
+        "fbise10english" ,
+        
+        "matrices", 
+        
+        "videoblog" ,
+        
+        "testtable"]);
+
     app.listen(PORT, ()=>{console.log(`listening on port ${PORT}`)});
 });
 ///////////////////////////////////////////////////////////////////////
