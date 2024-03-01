@@ -88,7 +88,7 @@ TcodeRouter.post("/read" , async function(req,res) {
 TcodeRouter.post("/where" , async function(req,res) {
  try{
    const tcode  = req.body.tcode;
-   const query  = req.body.query;
+   const query  = req.body.query || {};
    if (!query || !tcode) {return  res.status(400).json({ message: "missing data" }); }
   
    const theMdl = await getTcode(tcode);
