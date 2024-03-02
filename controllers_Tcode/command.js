@@ -74,6 +74,18 @@ debugger;
     case 'create':
         result = await theMdl.addQuestion(tcode,arg_array.questionData);
     break;
+    
+    case 'getExerciseByChapter':
+        result = await theMdl.getExerciseByChapter(arg_array.chapterNumber, arg_array.exerciseName);
+    break;
+    
+    case 'getChapterSyllabus':
+        result = await theMdl.getChapterSyllabus(arg_array.chapterNumber);
+    break;
+    
+    case 'getExerciseByChapterSyllabus':
+        result = await theMdl.getExerciseByChapterSyllabus(arg_array.chapterNumber, arg_array.exerciseName);
+    break;
    
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////

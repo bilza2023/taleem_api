@@ -97,5 +97,15 @@ This api provides api for dealing with tcode and user modules.
 13    command : 'create':
         result = await theMdl.addQuestion(tcode,arg_array.questionData);
 
+    
+14    command : 'getExerciseByChapter':
+        result = await theMdl.getExerciseByChapter(arg_array.chapterNumber, arg_array.exerciseName);
+    
+15    command : 'getChapterSyllabus':
+        result = await theMdl.getChapterSyllabus(arg_array.chapterNumber);
+    
+16    command : 'getExerciseByChapterSyllabus':
+        result = await theMdl.getExerciseByChapterSyllabus(arg_array.chapterNumber, arg_array.exerciseName);
+
 
 ```
