@@ -86,6 +86,10 @@ debugger;
     case 'getExerciseByChapterSyllabus':
         result = await theMdl.getExerciseByChapterSyllabus(arg_array.chapterNumber, arg_array.exerciseName);
     break;
+    
+    case 'slidesState':
+        result = await theMdl.slidesState(arg_array.chapterNumber, arg_array.exerciseName);
+    break;
    
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////

@@ -6,6 +6,8 @@ const cors = require('cors');
 const db = require("./mongoDb/mongo.js");
 
 const {getTcode,registerTcode} = require('tcode_module');
+const command = require('./command.js');
+
 const signup = require('./controllers/signup.js')
 const login = require('./controllers/login.js')
 const change_password = require('./controllers/change_password.js')
@@ -46,6 +48,9 @@ app.get('/', async (req, res) =>{
 res.status(500).json({success :true ,  message : "Welcome to Taleem API"});
 });
 ////////////////////////////////////////////////////////
+app.post("/command", async function (req, res) {
+    return await command(req,res);
+});
 ///////////////////////////////////////////////////////////////////////
 db.once('open',()=> {
     // debugger;

@@ -9,12 +9,7 @@ const {getTcode} = require('tcode_module');
 const syllabus = require('./syllabus');
 const read = require('./read');
 const deleteFn = require('./deleteFn');
-const command = require('./command.js');
 
-///////////////////////////////////////////////////////////////////////
-TcodeRouter.post("/command", async function (req, res) {
-  return command(req,res);command
-});
   ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/syllabus", async function (req, res) {
    return syllabus(req,res);
