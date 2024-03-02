@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongoservice:
+    image: mongo
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+
+  api:
+    build: .
+    container_name: api
+    image: taleemhelp/api:0.3
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://mongoservice:27017/db_name
+      JWT_SECRET: "40z9j5.xtnv2ljt?yw)8qy4MclNB2VYPG1U4O2E#KQsld(jnviygvr!@fh93qyngnpAB"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongoservice
+
+volumes:
+  mongodb-data:
