@@ -59,7 +59,7 @@ debugger;
     break;
     
     case 'get':
-        result = await theMdl.delete(arg_array.id);
+        result = await theMdl.get(arg_array.id);
     break;
     
     case 'update':

@@ -107,5 +107,8 @@ This api provides api for dealing with tcode and user modules.
 16    command : 'getExerciseByChapterSyllabus':
         result = await theMdl.getExerciseByChapterSyllabus(arg_array.chapterNumber, arg_array.exerciseName);
 
+17    command : 'slidesState':
+        result = await theMdl.slidesState(arg_array.chapterNumber, arg_array.exerciseName);
+
 
 ```
