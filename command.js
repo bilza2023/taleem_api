@@ -17,7 +17,7 @@ if (!arg_array) {return  res.status(400).json({ message: "missing arg_array" });
 const theMdl = await getTcode(tcode);
 // const theMdl = await getModel(tcode);
 if(!theMdl) { return res.status(404).json({ ok:false, message: "model not found" });}
-debugger;
+// debugger;
  switch (command) {
     case 'count':
         result = await theMdl.count(arg_array.query={});

@@ -2,9 +2,45 @@ require('dotenv').config();
 
 const express  =require('express');
 const cors = require('cors');
+
+const multer = require('multer');
+const AWS = require('aws-sdk');
+// const multerS3 = require('multer-s3');
 // const mongoose = require('mongoose');
+// const fs = require('fs');
+  
+
+
 const db = require("./mongoDb/mongo.js");
 
+const upload = multer();
+
+const s3 = new AWS.S3({
+  accessKeyId: 'DO002RJ3BRP3TMKZCG9G',
+  secretAccessKey: 'GrBzXEa3ssjmCVy6M6t5tBiXprXnjXH5GNEh+rjlBns',
+  endpoint: 'http://blr1.digitaloceanspaces.com',
+});
+
+  const uploadImageToSpace = async (file,tcode) => {
+    const params = {
+      Bucket: 'taleem-media',
+      Key: `images/${tcode}/${file.originalname}`, // Change the key as per your requirement
+      Body: file.buffer,
+      ACL: 'public-read',      
+      ContentType: 'image/jpeg', // Change content type if not JPEG
+    };
+  
+    try {
+      const data = await s3.upload(params).promise();
+      // console.log('Image upload successful:', data.Location);
+      return data.Location;
+    } catch (error) {
+      // console.error('Error uploading image:', error);
+      throw error;
+    }
+};
+
+////////////////////////////////////////////////////////////
 const {getTcode,registerTcode} = require('tcode_module');
 const command = require('./command.js');
 
@@ -48,6 +84,62 @@ app.get('/', async (req, res) =>{
 res.status(500).json({success :true ,  message : "Welcome to Taleem API"});
 });
 ////////////////////////////////////////////////////////
+// const mp3_exists = async (params) => {
+  //   try {
+  //     debugger;
+  //     const data = await s3.listObjectsV2(params).promise();
+  //     return data.Contents.map((obj) => obj.Key);
+  //   } catch (error) {
+  //     console.error('Error listing objects:', error);
+  //     throw error;
+  //   }
+// };
+
+app.post('/upload_mp3', upload.single('mp3'), async (req, res) => {
+    
+    try{
+      const mp3File = req.file; 
+      const tcode = req.body.tcode; 
+      const exercise = req.body.exercise; 
+
+      if (!mp3File || !tcode  || !exercise) {
+          return res.status(400).json({ success: false, message: 'No MP3 file or relevant data uploaded' });
+      }
+
+      ///////////////////////////////////////////////////
+      const params = {
+        Bucket: 'taleem-media',
+        Key: `mp3/${tcode}/${exercise}/${mp3File.originalname}`, 
+        Body: mp3File.buffer,
+        ACL: 'public-read',
+        ContentType: 'audio/mpeg',
+      };
+              
+              const data = await s3.upload(params).promise();
+              res.status(200).json({ success: true, message: 'MP3 file uploaded successfully' });
+
+      ////////////////////////////////////////////////////
+        } catch (error) {
+          res.status(500).json({ success: true, message: 'Failed to upload' });
+        }
+  });
+  
+app.post('/upload_image', upload.single('image'), async (req, res) => {
+    try {
+      const file = req.file;
+      const tcode = req.body.tcode;
+      if (!file || !tcode) {
+        return res.status(400).json({ success: false, message: 'No image file (or tcode) uploaded' });
+      }
+      const fileUrl = await uploadImageToSpace(file,tcode);
+      res.status(200).json({ success: true, message: 'Image file uploaded successfully', url: fileUrl });
+    } catch (error) {
+      // console.error('Error uploading image:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+  
+//////////////////////////////////////////////////////////////
 app.post("/command", async function (req, res) {
     return await command(req,res);
 });
@@ -71,9 +163,3 @@ db.once('open',()=> {
     app.listen(PORT, ()=>{console.log(`listening on port ${PORT}`)});
 });
 ///////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
