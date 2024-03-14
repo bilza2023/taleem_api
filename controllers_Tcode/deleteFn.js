@@ -2,7 +2,6 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const {getTcode} = require('tcode_module');
 
 
@@ -19,7 +18,7 @@ async function deleteFn(req, res) {
         if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
       
            const delete_result = await theMdl.delete(id );    
-           return res.status(200).json({ok:true, message : 'question deleted',delete_result  });
+           return res.status(delete_result.status).json({ok:delete_result.ok, message : delete_result.message  });
             
         } catch(error) {
           return res.status(400).json({ok:false, msg : 'unknown error!'  });
