@@ -9,7 +9,6 @@
  */
 // const mongoose = require("mongoose");
 const prepResp = require('./fn/prepResp');
-const getIncomming = require('./fn/getIncomming');
 const getFilename = require('./fn/getFilename');
 
 
@@ -58,14 +57,10 @@ async update(question) {
   }
 }
 //Get Question
-async get(req) { //id
+async get(id) { //id
   try {
-    const incomming_data = getIncomming(req,["id"]);
-    if(!incomming_data.ok){
-      return prepResp(false,400,incomming_data.message); 
-    }
-
-    const question = await this.model.findById(incomming_data.id).lean();
+    
+    const question = await this.model.findById('659e87f992faba116b079b43').lean();
 
     // Check if the question exists
     if (question !== null) {

@@ -5,9 +5,13 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 
 const TcodeRouter = express.Router();
+const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
+
+const getIncomming = require('../fn/getIncomming');
+const finalJson = require('../fn/finalJson');
+
 const {getTcode} = require('../dbLayer');
 const syllabus = require('./syllabus');
-const read = require('./read');
 const deleteFn = require('./deleteFn');
 
   ///////////////////////////////////////////////////////////////////////
@@ -79,8 +83,24 @@ TcodeRouter.post("/create" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
-TcodeRouter.post("/read" , async function(req,res) {
- return read(req,res);
+TcodeRouter.post("/get" , async function(req,res) {
+  try{ //debugger;
+  // accept tcode,id return question
+//////////////////===> check incomming <======/////////////////////////////
+  const incomming_data = await getIncomming(req,res,["id","tcode"]);
+   if(!incomming_data.ok){
+      return incommingErrorJson(incomming_data); 
+  }
+  //TCode is not used here since it is simple.
+  const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema); 
+  const question = await mongoose_mdl.findById('659e87f992faba116b079b43').lean();
+
+//////////////////===> final json <======//////////////////////////////////
+    return finalJson({question},['question'],res);
+//////////////////////////////////////////////////////////////////////////
+    } catch(error) {
+      return res.status(400).json({message : 'unknown error!'  });
+    }
 });
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
