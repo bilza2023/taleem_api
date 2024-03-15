@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const {getTcode} = require('tcode_module');
-
+const {getTcode} = require('../dbLayer');
 
 ///////////////////////////////////////////////////////////////////////
 async function read(req, res) {

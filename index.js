@@ -5,10 +5,6 @@ const cors = require('cors');
 
 const multer = require('multer');
 const AWS = require('aws-sdk');
-// const multerS3 = require('multer-s3');
-// const mongoose = require('mongoose');
-// const fs = require('fs');
-  
 
 
 const db = require("./mongoDb/mongo.js");
@@ -41,7 +37,7 @@ const s3 = new AWS.S3({
 };
 
 ////////////////////////////////////////////////////////////
-const {getTcode,registerTcode} = require('tcode_module');
+const {getTcode,registerTcode} = require('./dbLayer');
 const command = require('./command.js');
 
 const signup = require('./controllers/signup.js')

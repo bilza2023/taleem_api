@@ -4,7 +4,8 @@ const bcrypt = require('bcryptjs');
 // const sendGmail = require("./gmail.js");
 // const send_Forget_Password_Gmail = require("./forget_password_gmail.js");
 const { v4: uuid } = require('uuid');
-const {getTcode,registerTcode,getUser} = require('tcode_module');
+// const {getTcode,registerTcode,getUser} = require('tcode_module');
+const {getUser} = require('../dbLayer');
 
 
 async function signup(req, res) {

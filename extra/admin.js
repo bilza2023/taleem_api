@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const db = require("./mongoDb/mongo.js");
+const db = require("../mongoDb/mongo.js");
 
 const MathFullObj = require("./mathFull/MathFullObj.js");
 const {MathFull} = require("./mathFull/mathFull.js");

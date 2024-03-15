@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const db = require("./mongoDb/mongo.js");
+const db = require("../mongoDb/mongo.js");
 const addSyllabus = require("./syllabus/addSyllabus.js");
 const partAndNotPartQs = require("./syllabus/partAndNotPartQs.js");
 const {MathFull} = require("./models/mathFull.js");

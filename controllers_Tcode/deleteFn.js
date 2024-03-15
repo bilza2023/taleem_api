@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {getTcode} = require('tcode_module');
+const {getTcode} = require('../dbLayer');
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 require('dotenv').config();
-const db = require("./mongoDb/mongo.js");
+const db = require("../mongoDb/mongo.js");
 const stats = require("./stats/stats.js");
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////

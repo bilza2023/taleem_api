@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 
 const TcodeRouter = express.Router();
-const {getTcode} = require('tcode_module');
+const {getTcode} = require('../dbLayer');
 const syllabus = require('./syllabus');
 const read = require('./read');
 const deleteFn = require('./deleteFn');

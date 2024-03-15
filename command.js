@@ -1,5 +1,5 @@
 
-const {getTcode} = require('tcode_module');
+const {getTcode} = require('./dbLayer');
 
 
 async function command(req, res){
