@@ -29,6 +29,7 @@ if (!command) {return  res.status(400).json({ message: "missing command" }); }
     break;
     
     case 'getSyllabus':
+        debugger;
         await runCommand(req,res,'getSyllabus',['tcode'],['syllabus']);
     break;
     
