@@ -137,7 +137,7 @@ app.post('/upload_image', upload.single('image'), async (req, res) => {
   
 //////////////////////////////////////////////////////////////
 app.post("/command", async function (req, res) {
-  debugger;
+  // debugger;
     return await command(req,res);
 });
 ///////////////////////////////////////////////////////////////////////

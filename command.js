@@ -1,7 +1,13 @@
 
-const {getTcode} = require('./dbLayer');
+// const {getTcode} = require('./dbLayer');
+const getIncomming = require('./fn/getIncomming');
+const getMdl = require('./fn/getMdl');
+const finalJson = require('./fn/finalJson');
+const TCodeSchema = require('./dbLayer/tcode/TCodeSchema');
+const mongoose = require('mongoose');
 
 
+/////////////////////////////////////////////////////////////////
 async function command(req, res){
     try {
 
@@ -12,90 +18,16 @@ if (!tcode) {return  res.status(400).json({ message: "missing tcode" }); }
 const command  = req.body.command;
 if (!command) {return  res.status(400).json({ message: "missing command" }); }
 
-// const arg_array  = req.body.arg_array;
-// if (!arg_array) {return  res.status(400).json({ message: "missing arg_array" }); }
-
-// const theMdl = await getTcode(tcode);
-// // const theMdl = await getModel(tcode);
-// if(!theMdl) { return res.status(404).json({ ok:false, message: "model not found" });}
-// // debugger;
 
 
 //////////////////////////////////////////////////////////////////////////
  switch (command) {
 
     case 'get':
-        result = await theMdl.get(arg_array.id);
+        
+        result = await runCommand(req,res,['id','tcode'],['question']);
     break;
     
-    case 'count':
-        result = await theMdl.count(arg_array.query={});
-    break;
-
-    case 'chapterMap':
-        result = await theMdl.chapterMap();
-    break;
-
-    case 'getExercise':
-        result = await theMdl.getExercise(arg_array.exerciseName);
-    break;
-    case 'getChapter':
-        result = await theMdl.getChapter(arg_array.chapterNumber);
-    break;
-
-    case 'getByQuestionType':
-        result = await theMdl.getByQuestionType(arg_array.questionType);
-    break;
-
-    case 'getByStatus':
-        result = await theMdl.getByStatus(arg_array.status);
-    break;
-    
-    case 'where':
-        result = await theMdl.where(arg_array.query);
-    break;
-    
-    case 'getUniqueChapters':
-        result = await theMdl.getUniqueChapters();
-    break;
-    
-    case 'getUniqueExercises':
-        result = await theMdl.getUniqueExercises();
-    break;
-
-    case 'delete':
-        result = await theMdl.delete(arg_array.id);
-    break;
-    
-    case 'update':
-        result = await theMdl.update(arg_array.question);
-    break;
-    
-    case 'getSyllabus':
-        result = await theMdl.getSyllabus();
-    break;
-
-    //--i have renamed addQuestion here
-    case 'create':
-        result = await theMdl.addQuestion(tcode,arg_array.questionData);
-    break;
-    
-    case 'getExerciseByChapter':
-        result = await theMdl.getExerciseByChapter(arg_array.chapterNumber, arg_array.exerciseName);
-    break;
-    
-    case 'getChapterSyllabus':
-        result = await theMdl.getChapterSyllabus(arg_array.chapterNumber);
-    break;
-    
-    case 'getExerciseByChapterSyllabus':
-        result = await theMdl.getExerciseByChapterSyllabus(arg_array.chapterNumber, arg_array.exerciseName);
-    break;
-    
-    case 'slidesState':
-        result = await theMdl.slidesState(arg_array.chapterNumber, arg_array.exerciseName);
-    break;
-   
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////
     default:
@@ -120,23 +52,22 @@ if (!command) {return  res.status(400).json({ message: "missing command" }); }
 //////////////////////////////////////////////////////////////////
 module.exports = command;
 //////////////////////////////////////////////////////////////////
-async function runCommand(req,res,incomming_data){
+async function runCommand(req,res,incomming=[],outgoing=[]){
 
-    try{ //debugger;
+    try{ debugger;
         // accept tcode,id return question
-      //////////////////===> check incomming <======/////////////////////////////
-        const incomming_data = await getIncomming(req,res,incomming_data);
-         if(!incomming_data.ok){
-            return incommingErrorJson(incomming_data); 
-        }
+      //////////////////===> check incomming -1 <======/////////////////////////////
+        const data = await getIncomming(req,incomming);
+        await getMdl(data);
+        //////////////////===> The Process-2 <======//////////////////////////////////
         //TCode is not used here since it is simple.
-        const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema); 
-        const question = await mongoose_mdl.findById('659e87f992faba116b079b43').lean();
-      
-      //////////////////===> final json <======//////////////////////////////////
-          return finalJson({question},['question'],res);
-      //////////////////////////////////////////////////////////////////////////
-          } catch(error) {
-            return res.status(400).json({message : 'unknown error!'  });
+        const mongoose_mdl =  mongoose.model(data.tcode, TCodeSchema);
+        const question = await mongoose_mdl.findById(data.id.toString()).lean();
+      //////////////////===> final json-3 <======//////////////////////////////////
+          return finalJson({question},outgoing,res);
+        // }
+        //////////////////////////////////////////////////////////////////////////
+          } catch (error) {
+            return res.status(500).json({message:error.message , error})
           }
 }
