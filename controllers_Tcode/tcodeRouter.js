@@ -6,7 +6,6 @@ const express = require('express');
 
 const TcodeRouter = express.Router();
 const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
-const TaleemError = require('../fn/taleemError');
 
 
 const getIncomming = require('../fn/getIncomming');

@@ -40,68 +40,52 @@ class TCode {
     return prepResp(false,500,"Failed to fetch syllabus data",error);
     }
 }
-//update
-async update(question) {
+async get(data) { //id
   try {
-    // Specify update options
-    const options = { new: false, upsert: false };
+    const item = await this.model.findById(data.id).lean();
 
-    // Attempt to update the question in the database
-    const updateResult = await this.model.findByIdAndUpdate(question._id, question, options);
-
-    // Return a success message along with the update result if successful
-    return { ok: true, result: updateResult, message: 'Question updated successfully' };
-
-  } catch (error) {
-    return prepResp(false,500,"update failed",error);
-  }
-}
-//Get Question
-async get(id) { //id
-  try {
-    
-    const question = await this.model.findById('659e87f992faba116b079b43').lean();
-
-    // Check if the question exists
-    if (question !== null) {
-      const ret = prepResp(true,200,'success'); 
-      ret.questiont = question;  //attach question to outgoing
-      return ret; 
+    if (item == null) {
+      throw new Error(`Could not find the question`); 
     } else {
-      return prepResp(false,404,"Question not found",error);
+      return {item};
     }
   } catch (error) {
-    return prepResp(false,500,"failed to get",error);
+      throw error;
   }
 }
-async addQuestion(tcode, qData) {
+
+async update(data) {
   try {
-    // Generate filename for the question
-    getFilename(qData, tcode);
-
-    // Create a new question instance
-    const newQuestion = new this.model(qData);
-
-    // Save the question to the database
-    const savedQuestion = await newQuestion.save();
-
-    // Return success message along with the saved question
-    return { ok: true, question: savedQuestion, message: 'Question created successfully' };
+    // new: true mean return the new document and not the old one
+    const options = { new: true, upsert: false };
+    const item = await this.model.findByIdAndUpdate(data.question._id, data.question, options);
+      return { item };
   } catch (error) {
-    return prepResp(false,500,"failed to add question",error);
+      throw error;
+  }
+}
+
+async create(data) {
+  try {
+    getFilename(data.question, data.tcode);
+    const newQuestion = new this.model(data.question);
+    const item = await newQuestion.save();
+    return { item };
+
+  } catch (error) {
+      throw error;
   }
 }
 
 ///////////////////////////////
-async where(query = {}) {
+async where(data = {}) {
   try {
-    // Use Mongoose's "find" method with the provided query
-    const items = await this.model.find(query);
+    const items = await this.model.find(data);
 
     // Return the items along with success message
-    return { ok: true, items, message: 'success' };
+    return { items };
   } catch (error) {
-    return prepResp(false,500,"failed query where",error);
+    throw error;
   }
 }
 
@@ -114,7 +98,7 @@ async count(query = {}) {
     // Return the count along with success message
     return { ok: true, count, message: 'Count successful' };
   } catch (error) {
-    return prepResp(false,500,"failed to count",error);
+        throw error;
   }
 }
 
@@ -143,7 +127,7 @@ async delete(id) {
     // Return success message
     return { ok: true, message: 'Question deleted', status: 200 };
   } catch (error) {
-    return prepResp(false,500,"failed to delete",error);
+    throw error;
   }
 }
  
@@ -173,7 +157,7 @@ async getUniqueChapters() {
       return { ok: false, message: "No chapters found" };
     }
   } catch (error) {
-    return prepResp(false,500,"failed to get unique chapters",error);
+    throw error;
   }
 }
 
@@ -204,7 +188,7 @@ async getUniqueExercises() {
     }
   } catch (error) {
     
-    return prepResp(false,500,"failed to get unique exercises",error);
+    throw error;
   }
 }
 
@@ -214,7 +198,7 @@ async getByStatus(status = "final") {
 
     return { ok: true, items, message: "Success" };
   } catch (error) {
-    return prepResp(false,500,"failed to get by status",error);
+    throw error;
   }
 }
 
@@ -229,7 +213,7 @@ async getByQuestionType(questionType = "free") {
 
     return { ok: true, items, message: "Questions retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get by question type",error);
+    throw error;
   }
 }
 
@@ -244,7 +228,7 @@ async getChapter(chapterNumber) {
 
     return { ok: true, items, message: "Questions retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get chapter",error);
+    throw error;
   }
 }
 
@@ -259,7 +243,7 @@ async getExercise(exerciseName) {
 
     return { ok: true, items, message: "Questions retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get exercise",error);
+    throw error;
   }
 }
 async chapterMap() {
@@ -282,7 +266,7 @@ async chapterMap() {
 
     return { ok: true, chapterMap };
   } catch (error) {
-    return prepResp(false,500,"failed to get chapter map",error);
+    throw error;
   }
 }
 async getExerciseByChapter(chapterNumber, exerciseName) {
@@ -299,7 +283,7 @@ async getExerciseByChapter(chapterNumber, exerciseName) {
 
     return { ok: true, items, message: "Questions retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get exercise by chapter",error);
+      throw error;
   }
 }
 
@@ -324,7 +308,7 @@ async getChapterSyllabus(chapterNumber) {
 
     return { ok: true, items, message: "Chapter syllabus retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get chapter syllabus",error);
+      throw error;
   }
 }
 
@@ -353,7 +337,7 @@ async getExerciseByChapterSyllabus(chapterNumber, exerciseName) {
 
     return { ok: true, items, message: "Exercise syllabus retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get exercise Syllabus by chapter",error);
+      throw error;
   }
 }
 async slidesState(chapterNumber, exerciseName) {
@@ -385,7 +369,7 @@ async slidesState(chapterNumber, exerciseName) {
 
     return { ok: true, items, message: "Exercise syllabus retrieved successfully" };
   } catch (error) {
-    return prepResp(false,500,"failed to get slide state",error);
+    throw error;
   }
 }
 
