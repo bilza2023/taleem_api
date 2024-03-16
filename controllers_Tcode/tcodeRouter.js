@@ -6,8 +6,11 @@ const express = require('express');
 
 const TcodeRouter = express.Router();
 const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
+const TaleemError = require('../fn/taleemError');
+
 
 const getIncomming = require('../fn/getIncomming');
+const getMdl = require('../fn/getMdl');
 const finalJson = require('../fn/finalJson');
 
 const {getTcode} = require('../dbLayer');
@@ -16,27 +19,25 @@ const deleteFn = require('./deleteFn');
 
 ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/get" , async function(req,res) {
-    try{ //debugger;
+    try{ debugger;
     // accept tcode,id return question
   //////////////////===> check incomming -1 <======/////////////////////////////
-    const incomming_data = await getIncomming(req,res,["id","tcode"]);
-     if(incomming_data.ok){
+    const data = await getIncomming(req,["id","tcode"]);
+    await getMdl(data);
     //////////////////===> The Process-2 <======//////////////////////////////////
-    debugger;
     //TCode is not used here since it is simple.
-    const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema);
-    // const id = mongoose.Types.ObjectId(incomming_data.id); 
-    const question = await mongoose_mdl.findById(incomming_data.id.toString()).lean();
+    const mongoose_mdl =  mongoose.model(data.tcode, TCodeSchema);
+    const question = await mongoose_mdl.findById(data.id.toString()).lean();
   //////////////////===> final json-3 <======//////////////////////////////////
       return finalJson({question},['question'],res);
-    }
+    // }
     //////////////////////////////////////////////////////////////////////////
-      } catch(error) {
-        return res.status(400).json({message : 'unknown error!',error  });
+      } catch (error) {
+        return res.status(500).json({message:error.message , error})
       }
   });
 
-  ////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
 
 TcodeRouter.post("/syllabus", async function (req, res) {
    return syllabus(req,res);
