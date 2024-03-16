@@ -4,7 +4,6 @@ const {getTcode} = require('./dbLayer');
 
 async function command(req, res){
     try {
-
 let result;
 const tcode  = req.body.tcode;
 if (!tcode) {return  res.status(400).json({ message: "missing tcode" }); }
@@ -12,22 +11,14 @@ if (!tcode) {return  res.status(400).json({ message: "missing tcode" }); }
 const command  = req.body.command;
 if (!command) {return  res.status(400).json({ message: "missing command" }); }
 
-// const arg_array  = req.body.arg_array;
-// if (!arg_array) {return  res.status(400).json({ message: "missing arg_array" }); }
+const arg_array  = req.body.arg_array;
+if (!arg_array) {return  res.status(400).json({ message: "missing arg_array" }); }
 
-// const theMdl = await getTcode(tcode);
-// // const theMdl = await getModel(tcode);
-// if(!theMdl) { return res.status(404).json({ ok:false, message: "model not found" });}
-// // debugger;
-
-
-//////////////////////////////////////////////////////////////////////////
+const theMdl = await getTcode(tcode);
+// const theMdl = await getModel(tcode);
+if(!theMdl) { return res.status(404).json({ ok:false, message: "model not found" });}
+// debugger;
  switch (command) {
-
-    case 'get':
-        result = await theMdl.get(arg_array.id);
-    break;
-    
     case 'count':
         result = await theMdl.count(arg_array.query={});
     break;
@@ -65,6 +56,10 @@ if (!command) {return  res.status(400).json({ message: "missing command" }); }
 
     case 'delete':
         result = await theMdl.delete(arg_array.id);
+    break;
+    
+    case 'get':
+        result = await theMdl.get(arg_array.id);
     break;
     
     case 'update':
@@ -117,26 +112,4 @@ if (!command) {return  res.status(400).json({ message: "missing command" }); }
 
 
 
-//////////////////////////////////////////////////////////////////
 module.exports = command;
-//////////////////////////////////////////////////////////////////
-async function runCommand(req,res,incomming_data){
-
-    try{ //debugger;
-        // accept tcode,id return question
-      //////////////////===> check incomming <======/////////////////////////////
-        const incomming_data = await getIncomming(req,res,incomming_data);
-         if(!incomming_data.ok){
-            return incommingErrorJson(incomming_data); 
-        }
-        //TCode is not used here since it is simple.
-        const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema); 
-        const question = await mongoose_mdl.findById('659e87f992faba116b079b43').lean();
-      
-      //////////////////===> final json <======//////////////////////////////////
-          return finalJson({question},['question'],res);
-      //////////////////////////////////////////////////////////////////////////
-          } catch(error) {
-            return res.status(400).json({message : 'unknown error!'  });
-          }
-}

@@ -14,7 +14,30 @@ const {getTcode} = require('../dbLayer');
 const syllabus = require('./syllabus');
 const deleteFn = require('./deleteFn');
 
-  ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+TcodeRouter.post("/get" , async function(req,res) {
+    try{ //debugger;
+    // accept tcode,id return question
+  //////////////////===> check incomming -1 <======/////////////////////////////
+    const incomming_data = await getIncomming(req,res,["id","tcode"]);
+     if(incomming_data.ok){
+    //////////////////===> The Process-2 <======//////////////////////////////////
+    debugger;
+    //TCode is not used here since it is simple.
+    const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema);
+    // const id = mongoose.Types.ObjectId(incomming_data.id); 
+    const question = await mongoose_mdl.findById(incomming_data.id.toString()).lean();
+  //////////////////===> final json-3 <======//////////////////////////////////
+      return finalJson({question},['question'],res);
+    }
+    //////////////////////////////////////////////////////////////////////////
+      } catch(error) {
+        return res.status(400).json({message : 'unknown error!',error  });
+      }
+  });
+
+  ////////////////////////////////////////////////////////
+
 TcodeRouter.post("/syllabus", async function (req, res) {
    return syllabus(req,res);
 });
@@ -83,26 +106,7 @@ TcodeRouter.post("/create" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
-TcodeRouter.post("/get" , async function(req,res) {
-  try{ //debugger;
-  // accept tcode,id return question
-//////////////////===> check incomming <======/////////////////////////////
-  const incomming_data = await getIncomming(req,res,["id","tcode"]);
-   if(!incomming_data.ok){
-      return incommingErrorJson(incomming_data); 
-  }
-  //TCode is not used here since it is simple.
-  const mongoose_mdl =  mongoose.model(incomming_data.tcode, TCodeSchema); 
-  const question = await mongoose_mdl.findById('659e87f992faba116b079b43').lean();
 
-//////////////////===> final json <======//////////////////////////////////
-    return finalJson({question},['question'],res);
-//////////////////////////////////////////////////////////////////////////
-    } catch(error) {
-      return res.status(400).json({message : 'unknown error!'  });
-    }
-});
-////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/where" , async function(req,res) {
  try{
