@@ -77,7 +77,7 @@ app.post('/login',async (req,res)=>{
 // });
 ///////////////////////////Routes////////////////////////
 app.get('/', async (req, res) =>{
-res.status(500).json({success :true ,  message : "Welcome to Taleem API"});
+res.status(200).json({success :true ,  message : "Welcome to Taleem API"});
 });
 ////////////////////////////////////////////////////////
 // const mp3_exists = async (params) => {
@@ -141,22 +141,24 @@ app.post("/command", async function (req, res) {
     return await command(req,res);
 });
 ///////////////////////////////////////////////////////////////////////
-db.once('open',()=> {
-    // debugger;
-    console.log("MongoDb ===> connection established")
-    registerTcode([ 
-        "fbise9math" , 
-        "fbise10math" ,
+// db.once('open',()=> {
+//     // debugger;
+//     console.log("MongoDb ===> connection established")
+//     registerTcode([ 
+//         "fbise9math" , 
+//         "fbise10math" ,
         
-        "fbise9english" ,
-        "fbise10english" ,
+//         "fbise9english" ,
+//         "fbise10english" ,
         
-        "matrices", 
+//         "matrices", 
         
-        "videoblog" ,
+//         "videoblog" ,
         
-        "testtable"]);
+//         "testtable"]);
 
-    app.listen(PORT, ()=>{console.log(`listening on port ${PORT}`)});
-});
+//     app.listen(PORT, ()=>{console.log(`listening on port ${PORT}`)});
+// });
 ///////////////////////////////////////////////////////////////////////
+
+module.exports = app;

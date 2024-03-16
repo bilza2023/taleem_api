@@ -22,7 +22,7 @@ class TCode {
  async getSyllabus() {
   try {
     // Attempt to fetch syllabus data from the database
-    const questions = await this.model.find({}).select({
+    const syllabus = await this.model.find({}).select({
       chapter: 1,
       exercise: 1,
       name: 1,
@@ -34,10 +34,10 @@ class TCode {
     });
 
     // Return the fetched questions if successful
-    return { ok: true, questions };
+    return { syllabus };
 
   } catch (error) {
-    return prepResp(false,500,"Failed to fetch syllabus data",error);
+      throw error;
     }
 }
 async get(data) { //id
@@ -78,11 +78,9 @@ async create(data) {
 }
 
 ///////////////////////////////
-async where(data = {}) {
+async where(data = {query:{}}) {
   try {
-    const items = await this.model.find(data);
-
-    // Return the items along with success message
+    const items = await this.model.find(data.query);
     return { items };
   } catch (error) {
     throw error;
@@ -90,42 +88,28 @@ async where(data = {}) {
 }
 
 //////////////////////////
-async count(query = {}) {
+async count(data = {query:{}}) {
   try {
-    // Count documents matching the query
-    const count = await this.model.countDocuments(query);
-
-    // Return the count along with success message
-    return { ok: true, count, message: 'Count successful' };
+    const items = await this.model.countDocuments(data.query);
+    return { items };
   } catch (error) {
         throw error;
   }
 }
 
 //////////////////////////
-async delete(id) {
+async delete(data) {
   try {
-    // Convert the id to a MongoDB ObjectId
-    // const objectId = mongoose.Types.ObjectId(id);
-
-    // Find the question by id
-    const question = await this.model.findById(id);
-
-    // Check if the question exists
-    if (!question) {
-      return { ok: false, message: 'Question not found', status: 404 };
+    const item = await this.model.findById(data.id);
+    if (!item) {
+      throw new Error ("item not found");
     }
 
-    // Check if the question has slides
-    if (question.slides.length > 0) {
-      return { ok: false, message: 'Question has content', status: 500 };
+    if (item.slides.length > 0) {
+        throw new Error ('Question has content');
     }
-
-    // Delete the question
-    await this.model.findByIdAndRemove(id);
-
-    // Return success message
-    return { ok: true, message: 'Question deleted', status: 200 };
+    const delete_result = await this.model.findByIdAndRemove(data.id);
+    return { delete_result };
   } catch (error) {
     throw error;
   }
@@ -152,9 +136,9 @@ async getUniqueChapters() {
     ]);
 
     if (chapters.length > 0) {
-      return { ok: true, chapters: chapters[0].chapters };
+      return { chapters: chapters[0].chapters };
     } else {
-      return { ok: false, message: "No chapters found" };
+      return { chapters: 0 };
     }
   } catch (error) {
     throw error;
@@ -182,70 +166,66 @@ async getUniqueExercises() {
     ]);
 
     if (exercises.length > 0) {
-      return { ok: true, exercises: exercises[0].exercises };
+      return {  exercises: exercises[0].exercises };
     } else {
-      return { ok: false, message: "No exercises found" };
+      return { exercises:0 };
     }
   } catch (error) {
-    
     throw error;
   }
 }
 
-async getByStatus(status = "final") {
+async getByStatus(data= {status: "final"}) {
   try {
-    const items = await this.model.find({ status });
+    const items = await this.model.find({ status: data.status });
 
-    return { ok: true, items, message: "Success" };
+    return { items };
   } catch (error) {
     throw error;
   }
 }
 
-async getByQuestionType(questionType = "free") {
+async getByQuestionType( data= {questionType: "free"} ) {
   try {
-    // Validate the questionType input
-    if (!['free', 'paid', 'other'].includes(questionType)) {
+    if (!['free', 'paid', 'other'].includes(data.questionType)) {
       throw new Error("Invalid question type provided");
     }
 
-    const items = await this.model.find({ questionType });
+    const items = await this.model.find({ questionType: data.questionType });
 
-    return { ok: true, items, message: "Questions retrieved successfully" };
+    return { items };
   } catch (error) {
     throw error;
   }
 }
 
-async getChapter(chapterNumber) {
+
+async getChapter(data) {
   try {
-    // Validate the chapterNumber input
-    if (typeof chapterNumber !== 'number' || isNaN(chapterNumber)) {
+    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
     }
-
-    const items = await this.model.find({ chapter: chapterNumber });
-
-    return { ok: true, items, message: "Questions retrieved successfully" };
+    const items = await this.model.find({ chapter: data.chapterNumber });
+    return { items };
   } catch (error) {
     throw error;
   }
 }
 
-async getExercise(exerciseName) {
+async getExercise(data) {
   try {
-    // Validate the exerciseName input
-    if (typeof exerciseName !== 'string' || exerciseName.trim() === '') {
+    if (typeof data.exerciseName !== 'string' || data.exerciseName.trim() === '') {
       throw new Error("Invalid exercise name provided");
     }
-
-    const items = await this.model.find({ exercise: exerciseName });
-
-    return { ok: true, items, message: "Questions retrieved successfully" };
+    const items = await this.model.find({ exercise: data.exerciseName });
+    return { items };
   } catch (error) {
     throw error;
   }
 }
+
+//////////////////////////////////////////////////////
+
 async chapterMap() {
   try {
     const chapterMap = [];
@@ -264,37 +244,35 @@ async chapterMap() {
       chapterMap.push({ chapter, exercises });
     }
 
-    return { ok: true, chapterMap };
+    return { chapterMap };
   } catch (error) {
     throw error;
   }
 }
-async getExerciseByChapter(chapterNumber, exerciseName) {
+async getExerciseByChapter(data) {
   try {
-    // Validate the chapterNumber and exerciseName inputs
-    if (typeof chapterNumber !== 'number' || isNaN(chapterNumber)) {
+    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
     }
-    if (typeof exerciseName !== 'string' || exerciseName.trim() === '') {
+    if (typeof data.exerciseName !== 'string' || data.exerciseName.trim() === '') {
       throw new Error("Invalid exercise name provided");
     }
 
-    const items = await this.model.find({ chapter: chapterNumber, exercise: exerciseName });
+    const exercise = await this.model.find({ chapter: data.chapterNumber, exercise: data.exerciseName });
 
-    return { ok: true, items, message: "Questions retrieved successfully" };
+    return { exercise };
   } catch (error) {
       throw error;
   }
 }
 
-async getChapterSyllabus(chapterNumber) {
+async getChapterSyllabus(data) {
   try {
-    // Validate the chapterNumber input
-    if (typeof chapterNumber !== 'number' || isNaN(chapterNumber)) {
+    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
     }
 
-    const items = await this.model.find({ chapter: chapterNumber })
+    const syllabus = await this.model.find({ chapter: data.chapterNumber })
       .select({
         chapter: 1,
         exercise: 1,
@@ -306,23 +284,22 @@ async getChapterSyllabus(chapterNumber) {
         filename: 1,
       });
 
-    return { ok: true, items, message: "Chapter syllabus retrieved successfully" };
+    return { syllabus };
   } catch (error) {
       throw error;
   }
 }
 
-async getExerciseByChapterSyllabus(chapterNumber, exerciseName) {
+async getExerciseByChapterSyllabus(data) {
   try {
-    // Validate the chapterNumber and exerciseName inputs
-    if (typeof chapterNumber !== 'number' || isNaN(chapterNumber)) {
+    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
     }
-    if (typeof exerciseName !== 'string' || exerciseName.trim() === '') {
+    if (typeof data.exerciseName !== 'string' || data.exerciseName.trim() === '') {
       throw new Error("Invalid exercise name provided");
     }
 
-    const items = await this.model.find({ chapter: chapterNumber, exercise: exerciseName })
+    const syllabus = await this.model.find({ chapter: data.chapterNumber, exercise: data.exerciseName })
       .select({
         chapter: 1,
         exercise: 1,
@@ -331,27 +308,28 @@ async getExerciseByChapterSyllabus(chapterNumber, exerciseName) {
         questionNo: 1,
         questionType: 1,
         status: 1,
-        free: 1,
         filename: 1,
       });
 
-    return { ok: true, items, message: "Exercise syllabus retrieved successfully" };
+    return { syllabus };
   } catch (error) {
       throw error;
   }
 }
-async slidesState(chapterNumber, exerciseName) {
+
+
+async slidesState(data) {
   try {
     // Validate the chapterNumber and exerciseName inputs
-    if (typeof chapterNumber !== 'number' || isNaN(chapterNumber)) {
+    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
     }
-    if (typeof exerciseName !== 'string' || exerciseName.trim() === '') {
+    if (typeof data.exerciseName !== 'string' || data.exerciseName.trim() === '') {
       throw new Error("Invalid exercise name provided");
     }
 
     const items = await this.model.aggregate([
-      { $match: { chapter: chapterNumber, exercise: exerciseName } },
+      { $match: { chapter: data.chapterNumber, exercise: data.exerciseName } },
       { 
         $project: {
           chapter: 1,
@@ -367,7 +345,7 @@ async slidesState(chapterNumber, exerciseName) {
       }
     ]);
 
-    return { ok: true, items, message: "Exercise syllabus retrieved successfully" };
+    return {  items };
   } catch (error) {
     throw error;
   }
