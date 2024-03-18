@@ -56,9 +56,9 @@ app.use(cookieParser());
 const corsOptions = { 
   origin: ['https://backoffice-navy.vercel.app' , 'http://localhost:5173'],
   methods: 'POST', // Specify the allowed HTTP methods, e.g., 'GET', 'POST', 'PUT', etc.
-  allowedHeaders: ['Content-Type'], // Specify the allowed headers
+  allowedHeaders: ['Content-Type','Authorization'], // Specify the allowed headers
 };
-app.use(cors( corsOptions )); //working
+app.use(cors( '*', corsOptions )); //working
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
