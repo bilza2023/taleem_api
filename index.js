@@ -53,8 +53,13 @@ const PORT = process.env.PORT || 5000;
 const app = express()
 app.use(cookieParser());
 //..
+const corsOptions = { 
+  origin: ['https://backoffice-navy.vercel.app' , 'http://localhost:5173'],
+  methods: 'POST', // Specify the allowed HTTP methods, e.g., 'GET', 'POST', 'PUT', etc.
+  allowedHeaders: ['Content-Type'], // Specify the allowed headers
+};
+app.use(cors( corsOptions )); //working
 app.use(express.json());
-app.use(cors( )); //working
 app.use(express.urlencoded({ extended: true }));
 
 //.. Route middlewares--/////////////////////////////////////
