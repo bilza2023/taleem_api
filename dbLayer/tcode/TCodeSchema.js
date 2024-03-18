@@ -25,17 +25,17 @@ const SlidesSchema = require('./slidesSchema');
 const TCodeSchema = new Schema({
 
 //1
-chapter:{ // Chapter number 
+chapter:{ //===============> ** required 
           type:Number ,
           required:true , 
           },
 //2          
-exercise:{ 
+exercise:{ //===============> ** required
         type:String ,
-        required:false ,
+        required:true ,
         },
 //3        
-filename: {
+filename: { //===============> ** required
         type: String,
         required: true,
         unique: true 
