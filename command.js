@@ -12,12 +12,15 @@ const command  = req.body.command;
 if (!command) {return  res.status(400).json({ message: "missing command" }); }
 
 
-
 //////////////////////////////////////////////////////////////////////////
  switch (command) {
 
     case 'get':
         await runCommand(req,res,'get',['id','tcode'],['item']);
+    break;
+   
+    case 'getByFilename':
+        await runCommand(req,res,'getByFilename',['filename','tcode'],['item']);
     break;
     
     case 'update':
@@ -31,7 +34,7 @@ if (!command) {return  res.status(400).json({ message: "missing command" }); }
     case 'getSyllabus':
         await runCommand(req,res,'getSyllabus',['tcode'],['syllabus']);
     break;
-    
+     
     case 'where':
         await runCommand(req,res,'where',['query','tcode'],['items']);
     break;

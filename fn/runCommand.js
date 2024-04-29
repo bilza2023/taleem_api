@@ -8,7 +8,7 @@ const finalJson = require('../fn/finalJson');
 async function runCommand(req,res,command,incomming=[],outgoing=[]){
 
 try{ 
-    
+    // debugger;
     //////////////////===> check incomming-1 <======/////////////////////////////
     const incomming_data = await getIncomming(req,incomming);
     await getMdl(incomming_data);

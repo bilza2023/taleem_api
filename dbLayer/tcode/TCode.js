@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * 3-Mar-2024
  * What are rules implemented at this level
@@ -44,11 +45,11 @@ async get(data) { //id
   try {
     const item = await this.model.findById(data.id).lean();
 
-    if (item == null) {
-      throw new Error(`Could not find the question`); 
-    } else {
+    // if (item == null) {
+    //   throw new Error(`Could not find the question`); 
+    // } else {
       return {item};
-    }
+    // }
   } catch (error) {
       throw error;
   }
@@ -182,6 +183,19 @@ async getByStatus(data= {status: "final"}) {
     const items = await this.model.find({ status: data.status });
 
     return { items };
+  } catch (error) {
+    throw error;
+  }
+}
+async getByFilename(data = {filename:""}) {
+  try {
+    const item = await this.model.findOne({ filename : data.filename }).lean();
+
+    // if (!item) {
+    //   throw new Error(`Document with filename ${data.filename} not found`);
+    // }
+
+    return { item };
   } catch (error) {
     throw error;
   }

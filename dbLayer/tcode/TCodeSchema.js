@@ -6,7 +6,7 @@ const SlidesSchema = require('./slidesSchema');
  =========================== TcodeSchema =======================
  1 : chapter ***REQUIRED: Number , required
  2 : exercise***REQUIRED: String , required
- 3 : filename ***added  : String - required but auto added
+ 3 : filename ***added  : String - required but auto added /unique
  ==============================================================
  4 : questionNo         : Number , -
  5 : part               : Number , -
