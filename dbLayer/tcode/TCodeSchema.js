@@ -17,6 +17,8 @@ const SlidesSchema = require('./slidesSchema');
  10 : slides            : [Slides], -
  11 : tags              : [String]
  12 : sortOrder         : Number, 0
+ 13 : teacherComments   : String, ""
+ 12 : adminComments     : String, ""
 
  // for now removed "version" we will see when required, replaced it with "tags"
  // also removed "schemaType" since this is the only schema I have we will se if required but for now this creates confusion.
@@ -93,6 +95,18 @@ sortOrder: {
           type: Number,
           default: 0,
           required: true
+        },	
+//13        
+teacherComments: {
+          type: String,
+          default: "",
+          required: false
+        },	
+//14        
+adminComments: {
+          type: String,
+          default: "",
+          required: false
         }	
   
 });
