@@ -31,6 +31,7 @@ class TCode {
       questionNo:1,
       questionType: 1,
       status: 1,
+      sortOrder: 1,
       filename: 1,
     });
 
