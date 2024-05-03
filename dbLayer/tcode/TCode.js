@@ -104,15 +104,19 @@ async count(data = {query:{}}) {
 //////////////////////////
 async delete(data) {
   try {
-    const item = await this.model.findById(data.id);
+   debugger;
+    const item = await this.model.findById(data.id).lean();
     if (!item) {
       throw new Error ("item not found");
     }
+    if (!item.slides) {
+      throw new Error ("slides not found");
+    }
 
-    if (item.slides.length > 0) {
+    if (data.forced == false && item.slides.length > 0) {
         throw new Error ('Question has content');
     }
-    const delete_result = await this.model.findByIdAndRemove(data.id);
+    const delete_result = await this.model.findOneAndDelete({ _id: data.id });
     return { delete_result };
   } catch (error) {
     throw error;
