@@ -1,5 +1,5 @@
 
-const {fbise9math,fbise10math,fbise8math,experimental,fbise9english,matrices} = require('./q_manager/questionSchema/QuestionSchema.js');
+const {fbise9math,fbise10math,fbise8math,experimental,fbise9english,matrices,fbise9math2024} = require('./q_manager/questionSchema/QuestionSchema.js');
 
 
 async function getModel(tcode){
@@ -8,6 +8,10 @@ async function getModel(tcode){
         case 'fbise8math':
             return fbise8math;
             break;
+        case 'fbise9math2024':
+            return fbise9math2024;
+            break;
+        
         case 'fbise9math':
             return fbise9math;
             break;

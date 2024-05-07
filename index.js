@@ -160,9 +160,8 @@ db.once('open', () => {
 
     "matrices",
 
-    "videoblog",
-
-    "testtable"]);
+    "fbise9math2024"
+]);
 
   app.listen(PORT, () => { console.log(`listening on port ${PORT}`) });
 });

@@ -92,6 +92,7 @@ const fbise10math = mongoose.model('fbise10math', QuestionSchema);
 const fbise8math = mongoose.model('fbise8math', QuestionSchema);
 const experimental = mongoose.model('experimental', QuestionSchema);
 const fbise9english = mongoose.model('fbise9english', QuestionSchema);
+const fbise9math2024 = mongoose.model('fbise9math2024', QuestionSchema);
 const matrices = mongoose.model('matrices', QuestionSchema);
 
-module.exports = {QuestionSchema,fbise9math,fbise10math,fbise8math,experimental,fbise9english,matrices};
+module.exports = {QuestionSchema,fbise9math,fbise10math,fbise8math,experimental,fbise9english,matrices,fbise9math2024};
