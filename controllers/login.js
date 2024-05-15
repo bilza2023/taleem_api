@@ -31,7 +31,7 @@ async function login(req, res) {
         // }
         // encrypt incomming password to compare
       if ( bcrypt.compare(passwordPlain, user.password)) {
-            const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: "7d" });
+            const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: "365d" });
     
           res.set("Authorization", `Bearer ${token}`);
           return res.status(200).json({ok:true, message: "Login successful", token: token ,email});
