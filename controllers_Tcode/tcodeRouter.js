@@ -1,71 +1,71 @@
 require('dotenv').config(); 
-// const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 const express = require('express');
+const getFilename = require('../dbLayer/tcode/fn/getFilename');
 
 const TcodeRouter = express.Router();
-// const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
 
 const TCode = require('../dbLayer/tcode/TCode');
 
 const getIncomming = require('../fn/getIncomming');
-// const getMdl = require('../fn/getMdl');
 const finalJson = require('../fn/finalJson');
 
-// const {getTcode} = require('../dbLayer');
-const syllabus = require('./syllabus');
-const deleteFn = require('./deleteFn');
+// const deleteFn = require('./deleteFn');
+
+///////////////////////////////////////////////////////////////////////
+TcodeRouter.post("/create" , async function(req,res) {
+  try {
+    debugger;
+    //--> question must have tcode
+    const data = await getIncomming(req,["question"]);
+    getFilename(data.question   ,  data.question.tcode);
+    const mongoose_model = TCode.mongooseModel();
+    const newQuestion = new mongoose_model(data.question);
+    const item = await newQuestion.save();
+    if(item){
+        return res.status(200).json({item});
+    } else {
+        return res.status(500).json({"ok" : false, message: "Failed to save document." });
+    }
+  } catch(error) {
+    let errorMessage;
+    if (error.code === 11000) { // Duplicate key error
+        errorMessage = "Duplicate key error. The document already exists.";
+    } else {
+        errorMessage = error.message || 'Unknown error!';
+    }
+    return res.status(400).json({message: errorMessage });
+  }
+});
 
 ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/get" , async function(req,res) {
-    try{ debugger;
-    // accept tcode,id return question
-  //////////////////===> check incomming -1 <======/////////////////////////////
+    try{ 
     const data = await getIncomming(req,["id"]);
-    // await getMdl(data);
-    //////////////////===> The Process-2 <======//////////////////////////////////
-    //TCode is not used here since it is simple.
-
-    const question =  await TCode.get(data);
-    // const question = await mongoose_mdl.findById(data.id.toString()).lean();
-  //////////////////===> final json-3 <======//////////////////////////////////
+    // const question =  await TCode.get(data);
+    const question = await TCode.mongooseModel().findById(data.id).lean();
       return finalJson({question},['question'],res);
-    // }
-    //////////////////////////////////////////////////////////////////////////
       } catch (error) {
         return res.status(500).json({message:error.message , error})
       }
   });
-
 ////////////////////////////////////////////////////////
-
 TcodeRouter.post("/syllabus", async function (req, res) {
-   return syllabus(req,res);
+  debugger;
+  const data = await getIncomming(req,["tcode"]);
+   const items =  await TCode.getSyllabus(data.tcode);
+   return res.status(200).json({ items, message: "success",ok:true  });
 });
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/update" , async function(req,res) {
   try {
   debugger;
-  /////////////////////////////////////
-      // const verifyResp = verify(req); 
-      // if(!verifyResp.ok){
-      // return res.status(400).json({message:verifyResp.message})
-      // }/////////////////////////////////////
-  const question = req.body.question;
-  // const id  = presentation._id;
-  const tcode  = req.body.tcode;
-  
-  if (!question || !tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-  const theMdl = await getTcode(tcode);
-  // const theMdl = await getModel(tcode);
-  if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
-
-  //  const options = { new: false, upsert: false };
-   const tf  = await theMdl.update(question);
-      if (tf   ){
-        return res.status(200).json({ ok:true, message: 'success' });
+  const data = await getIncomming(req,["question"]);
+        const options = { new: true, upsert: false };
+  const question = await TCode.mongooseModel().findByIdAndUpdate(data.question._id, data.question, options).lean();
+      if (  question ){
+        return res.status(200).json({ ok:true, message: 'success',question });
       }else {
         return res.status(404).json({ message: "failed to save" });
       }
@@ -76,103 +76,48 @@ TcodeRouter.post("/update" , async function(req,res) {
 });
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
-TcodeRouter.post("/create" , async function(req,res) {
-  try {
-  debugger;
-  /////////////////////////////////////
-      // const verifyResp = verify(req); 
-      // if(!verifyResp.ok){
-      // return res.status(400).json({message:verifyResp.message})
-      // }/////////////////////////////////////
-  const data = {};    
-  data.question = req.body.question;
-  // const id  = presentation._id;
-  data.tcode  = req.body.tcode;
-  
-  if (!data.question || !data.tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-  // const theMdl = await getTcode(tcode);
-  // const theMdl = await getModel(tcode);
-  // if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
-
-  /////////////////////////////////////////////////////////////////////////
-  const result = await TCode.create(data);
-  if(result.ok){
-      return res.status(200).json(result);
-    }else {
-      return res.status(500).json(result);
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-  } catch(error) {
-    return res.status(400).json({message : 'unknown error!'  });
-  }
-});
-////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////
 TcodeRouter.post("/where" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   const query  = req.body.query || {};
-   if (!query || !tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
+  debugger;
+  const data = await getIncomming(req,["query" , "tcode"]);
+  data.query.tcode = data.tcode;
    /////////////////////////////////////////////////////////////////////////
-   const result = theMdl.where(query);
-   if(result.ok){
-       return res.status(200).json(result);
+   const items = await TCode.mongooseModel().find(data.query);
+   if(items){
+       return res.status(200).json(items);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
      }
-     /////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////
   }catch(e){
     return res.status(500).json({ ok:false, message: 'failed' });
   }
-  
 });
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/count" , async function(req,res) {
  try{
-  
-   const tcode  = req.body.tcode;
-   const query  = req.body.query || {};
-   if (!query || !tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
+  const data = await getIncomming(req,["query" , "tcode"]);
+  data.query.tcode = data.tcode;
    /////////////////////////////////////////////////////////////////////////
-   debugger;
-   const result = await theMdl.count(query);
-   if(result.ok){
-       return res.status(200).json(result);
-     }else {
-       return res.status(500).json({ ok:false, message: 'failed' });
-     }
-     /////////////////////////////////////////////////////////////////////////
-  }catch(e){
+   const count = await TCode.mongooseModel().countDocuments(data.query);
+   if(count){
+      return res.status(200).json({ "count" : count });
+   }else {
     return res.status(500).json({ ok:false, message: 'failed' });
+   }
+  /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+  return res.status(500).json({ ok:false, message: 'failed' });
   }
 });
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/getUniqueChapters" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   if (!tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
-   /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getUniqueChapters();
-   if(result.ok){
+  debugger;
+  const data = await getIncomming(req,["tcode"]);
+  const result = await TCode.getUniqueChapters(data.tcode);
+   if(result){
        return res.status(200).json(result);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
@@ -182,20 +127,14 @@ TcodeRouter.post("/getUniqueChapters" , async function(req,res) {
     return res.status(500).json({ ok:false, message: 'failed' });
   }
 });
-////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/getUniqueExercises" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   if (!tcode) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+  debugger;
+  const data = await getIncomming(req,["tcode"]);
+  const result = await TCode.getUniqueExercises(data.tcode);
  
-   /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getUniqueExercises();
-   if(result.ok){
+  if(result){
        return res.status(200).json(result);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
@@ -206,21 +145,16 @@ TcodeRouter.post("/getUniqueExercises" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
 TcodeRouter.post("/getByStatus" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   const status  = req.body.status;
-   if (!tcode || !status) {return  res.status(400).json({ message: "missing data" }); }
+  debugger;
+  const data = await getIncomming(req,["tcode" , "status"]);
   
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
    /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getByStatus(status);
-   if(result.ok){
-       return res.status(200).json(result);
+   const items = await TCode.mongooseModel().find({ "tcode": data.tcode, "status": data.status });
+
+   if(items){
+       return res.status(200).json(items);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
      }
@@ -233,18 +167,14 @@ TcodeRouter.post("/getByStatus" , async function(req,res) {
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/getByQuestionType" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   const questionType  = req.body.questionType;
-   if (!tcode || !questionType) {return  res.status(400).json({ message: "missing data" }); }
+  debugger;
+  const data = await getIncomming(req,["tcode" , "questionType"]);
   
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
    /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getByQuestionType(questionType);
-   if(result.ok){
-       return res.status(200).json(result);
+   const items = await TCode.mongooseModel().find({ "tcode": data.tcode, "questionType": data.questionType });
+
+   if(items){
+       return res.status(200).json(items);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
      }
@@ -254,21 +184,14 @@ TcodeRouter.post("/getByQuestionType" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
 TcodeRouter.post("/getChapter" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   const chapterNumber  = req.body.chapterNumber;
-   if (!tcode || !chapterNumber) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
+  debugger;
+  const data = await getIncomming(req,["tcode" , "chapter"]);
    /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getChapter(chapterNumber);
-   if(result.ok){
-       return res.status(200).json(result);
+   const items = await TCode.mongooseModel().find({"tcode" :data.tcode, "chapter": data.chapter });
+   if(items){
+       return res.status(200).json(items);
      }else {
        return res.status(500).json({ ok:false, message: 'failed' });
      }
@@ -280,37 +203,45 @@ TcodeRouter.post("/getChapter" , async function(req,res) {
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/getExercise" , async function(req,res) {
  try{
-   const tcode  = req.body.tcode;
-   const exerciseName  = req.body.exerciseName;
-   if (!tcode || !exerciseName) {return  res.status(400).json({ message: "missing data" }); }
-  
-   const theMdl = await getTcode(tcode);
-   // const theMdl = await getModel(tcode);
-   if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
- 
-   /////////////////////////////////////////////////////////////////////////
-   const result = await theMdl.getExercise(exerciseName);
-   if(result.ok){
-       return res.status(200).json(result);
-     }else {
-       return res.status(500).json({ ok:false, message: 'failed' });
-     }
-     /////////////////////////////////////////////////////////////////////////
-  }catch(e){
-    return res.status(500).json({ ok:false, message: 'failed' });
-  }
+  debugger;
+  const data = await getIncomming(req,["tcode" , "exercise"]);
+  /////////////////////////////////////////////////////////////////////////
+  const items = await TCode.mongooseModel().find({"tcode" :data.tcode, "exercise": data.exercise });
+  if(items){
+      return res.status(200).json(items);
+    }else {
+      return res.status(500).json({ ok:false, message: 'failed' });
+    }
+    /////////////////////////////////////////////////////////////////////////
+ }catch(e){
+   return res.status(500).json({ ok:false, message: 'failed' });
+ }
 });
 ////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////
 TcodeRouter.post("/delete" , async function(req,res) {
-  return deleteFn(req,res);
+  debugger;
+  const data = await getIncomming(req,[ "id" , "forced"]);
+  const item = await TCode.mongooseModel().findById(data.id).lean();
+    if (!item) {
+      throw new Error ("item not found");
+    }
+    if (!item.slides) {
+      throw new Error ("slides not found");
+    }
+
+    if (data.forced == false && item.slides.length > 0) {
+        throw new Error ('Question has content');
+    }
+    const delete_result = await TCode.mongooseModel().findOneAndDelete({ _id: data.id });
+     if(delete_result){
+      return res.status(200).json({ok:true, message : "Question Deleted",delete_result  });
+     }else {
+      return res.status(200).json({ok:false, message : "failed to get  a delete result" });
+     }
 });
 
 ////////////////////////////////////////////////////////
 module.exports = TcodeRouter;
-////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
 function verify(req) {

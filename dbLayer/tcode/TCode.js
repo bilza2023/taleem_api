@@ -1,22 +1,20 @@
 //@ts-nocheck
 /**
- * 3-Mar-2024
+ * 3-Mar-2024 Edited 17-May-2024
  * What are rules implemented at this level
  *  1- The item can not be deleted if has slides.
  *  2- The file path is calculated as per 1 exclusive function thus it is kept unique (add tcode to the path).
- *  3- "chapter" & "exercise" are only variables required but at create time "filename" is added into automatically.
+ *  3- "chapter", "exercise" && tcode are only 3 variables required but at create time "filename" is added into automatically.
  * 4- You can expose the mongoose-model using "mongooseModel()"
  * 5- I have decided to keep debugging-mode/non-debugging-mode out of this level (on top). This means that tcode_module is always in debugging mode and it is the api on top (Taleem_Api) to decide to expose it or not. From here we are sending all errors using "error"
  */
-// const mongoose = require("mongoose");
-// const prepResp = require('./fn/prepResp');
-const mongoose = require('mongoose');
+
 const getFilename = require('./fn/getFilename');
 
+const mongoose = require('mongoose');
 const TCodeSchema = require('./TCodeSchema');
-
-// const TCodeModel = mongoose.model('TCode', TCodeSchema, "database");
 const TCodeModel = mongoose.model('TCode', TCodeSchema, "database");
+
  
 class TCode {
   static model = TCodeModel;
@@ -25,40 +23,31 @@ class TCode {
     return this.model;
   } 
  
-  static async getSyllabus() {
-  try {
-    // Attempt to fetch syllabus data from the database
-    const syllabus = await this.model.find({}).select({
-      chapter: 1,
-      exercise: 1,
-      name: 1,
-      part: 1,
-      questionNo:1,
-      questionType: 1,
-      status: 1,
-      sortOrder: 1,
-      filename: 1,
-    });
-
-    // Return the fetched questions if successful
-    return { syllabus };
-
-  } catch (error) {
+  static async getSyllabus(tcode) {
+    try {
+      // Attempt to fetch syllabus data from the database where tcode matches
+      const syllabus = await this.model.find({ tcode }).select({
+        chapter: 1,
+        exercise: 1,
+        name: 1,
+        part: 1,
+        questionNo: 1,
+        questionType: 1,
+        status: 1,
+        sortOrder: 1,
+        filename: 1,
+      });
+  
+      // Return the fetched questions if successful
+      return syllabus ;
+  
+    } catch (error) {
       throw error;
     }
-}
-static async get(data) { //id
-  try {
-    const item = await this.model.findById(data.id).lean();
-      return {item};
-  } catch (error) {
-      throw error;
   }
-}
-
+  
 static async update(data) {
   try {
-
     // new: true mean return the new document and not the old one
     const options = { new: true, upsert: false };
     debugger;
@@ -84,53 +73,11 @@ static async create(data) {
   }
 }
 
-///////////////////////////////
-static async where(data = {query:{}}) {
-  try {
-    const items = await this.model.find(data.query);
-    return { items };
-  } catch (error) {
-    throw error;
-  }
-}
-
-//////////////////////////
-static async count(data = {query:{}}) {
-  try {
-    const items = await this.model.countDocuments(data.query);
-    return { items };
-  } catch (error) {
-        throw error;
-  }
-}
-
-//////////////////////////
-static async delete(data) {
-  try {
-   debugger;
-    const item = await this.model.findById(data.id).lean();
-    if (!item) {
-      throw new Error ("item not found");
-    }
-    if (!item.slides) {
-      throw new Error ("slides not found");
-    }
-
-    if (data.forced == false && item.slides.length > 0) {
-        throw new Error ('Question has content');
-    }
-    const delete_result = await this.model.findOneAndDelete({ _id: data.id });
-    return { delete_result };
-  } catch (error) {
-    throw error;
-  }
-}
- 
-static async getUniqueChapters() {
+static async getUniqueChapters(tcode) {
   try {
     const chapters = await this.model.aggregate([
       {
-        $match: { chapter: { $exists: true } }
+        $match: { chapter: { $exists: true }, tcode: { $eq: tcode } }
       },
       {
         $group: {
@@ -156,11 +103,12 @@ static async getUniqueChapters() {
   }
 }
 
-static async getUniqueExercises() {
+
+static async getUniqueExercises(tcode) {
   try {
     const exercises = await this.model.aggregate([
       {
-        $match: { exercise: { $exists: true } }
+        $match: { exercise: { $exists: true }, tcode: { $eq: tcode } }
       },
       {
         $group: {
@@ -186,15 +134,6 @@ static async getUniqueExercises() {
   }
 }
 
-static async getByStatus(data= {status: "final"}) {
-  try {
-    const items = await this.model.find({ status: data.status });
-
-    return { items };
-  } catch (error) {
-    throw error;
-  }
-}
 static async getByFilename(data = {filename:""}) {
   try {
     const item = await this.model.findOne({ filename : data.filename }).lean();
@@ -223,18 +162,6 @@ static async getByQuestionType( data= {questionType: "free"} ) {
   }
 }
 
-
-static async getChapter(data) {
-  try {
-    if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
-      throw new Error("Invalid chapter number provided");
-    }
-    const items = await this.model.find({ chapter: data.chapterNumber });
-    return { items };
-  } catch (error) {
-    throw error;
-  }
-}
 
 static async getExercise(data) {
   try {
