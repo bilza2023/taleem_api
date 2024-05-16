@@ -3,7 +3,7 @@
  * 3-Mar-2024
  * What are rules implemented at this level
  *  1- The item can not be deleted if has slides.
- *  2- The file path is calculated as per 1 exclusive function thus it is kept unique.
+ *  2- The file path is calculated as per 1 exclusive function thus it is kept unique (add tcode to the path).
  *  3- "chapter" & "exercise" are only variables required but at create time "filename" is added into automatically.
  * 4- You can expose the mongoose-model using "mongooseModel()"
  * 5- I have decided to keep debugging-mode/non-debugging-mode out of this level (on top). This means that tcode_module is always in debugging mode and it is the api on top (Taleem_Api) to decide to expose it or not. From here we are sending all errors using "error"

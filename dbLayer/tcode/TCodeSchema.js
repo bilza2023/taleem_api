@@ -4,21 +4,22 @@ const Schema = mongoose.Schema;
 const SlidesSchema = require('./slidesSchema');
 /**
  =========================== TcodeSchema =======================
- 1 : chapter ***REQUIRED: Number , required
- 2 : exercise***REQUIRED: String , required
- 3 : filename ***added  : String - required but auto added /unique
+ 1:  tcode **REQUIRED : String, "general"       
+ 2 : chapter ***REQUIRED: Number , required
+ 3 : exercise***REQUIRED: String , required
+ 4 : filename ***added  : String - required but auto added /unique
  ==============================================================
- 4 : questionNo         : Number , -
- 5 : part               : Number , -
- 6 : name               : String , -
- 7 : questionType       : ['paid', 'login' , 'free'],  , "paid"
- 8 : status             : ['empty' ,'fill' ,'locked', 'final'], "empty"
- 9 : filledBy           : String, -
- 10 : slides            : [Slides], -
- 11 : tags              : [String]
- 12 : sortOrder         : Number, 0
- 13 : teacherComments   : String, ""
- 12 : adminComments     : String, ""
+ 5 : questionNo         : Number , -
+ 6 : part               : Number , -
+ 7 : name               : String , -
+ 8 : questionType       : ['paid', 'login' , 'free'],  , "paid"
+ 9 : status             : ['empty' ,'fill' ,'locked', 'final'], "empty"
+ 10 : filledBy           : String, -
+ 11 : slides            : [Slides], -
+ 12 : tags              : [String]
+ 13 : sortOrder         : Number, 0
+ 14 : teacherComments   : String, ""
+ 15 : adminComments     : String, ""
 
  // for now removed "version" we will see when required, replaced it with "tags"
  // also removed "schemaType" since this is the only schema I have we will se if required but for now this creates confusion.
@@ -26,46 +27,52 @@ const SlidesSchema = require('./slidesSchema');
 ///////////////////////////////////////////
 const TCodeSchema = new Schema({
 
-//1
+//1        
+tcode: {
+        type: String,
+        default: "general",
+        required: true
+      },	
+//2
 chapter:{ //===============> ** required 
           type:Number ,
           required:true , 
           },
-//2          
+//3          
 exercise:{ //===============> ** required
         type:String ,
         required:true ,
         },
-//3        
+//4        
 filename: { //===============> ** required
         type: String,
         required: true,
         unique: true 
       },
-//4        
+//5        
 questionNo:{//same as above 
         type:Number ,
         required:false ,
         },
-//5        
+//6        
 part:{  
         type:Number ,
         required:false ,
         },
-//6
+//7
 name:{  
       type:String ,
       required:false ,
       },
 
-//7
+//8
 questionType:{ 
         type: String ,
         enum: ['paid', 'login' , 'free'],
         required: true,
         default : 'paid'
       },
-//8      
+//9      
 status:{
 	  type: String ,
 	  required:true , 
@@ -73,41 +80,41 @@ status:{
     required: true,
     default : 'empty'
 	  },
-//9
+//10
 	filledBy: {
         type: String,
         required: false
         },
-//10	
+//11	
 slides: {
         type: [SlidesSchema],
         required: true,
         default : []
         },
-//11        
+//12        
 tags: {
           type: [String],
           default: [],
           required: true
         },	
-//12        
+//13        
 sortOrder: {
           type: Number,
           default: 0,
           required: true
         },	
-//13        
+//14        
 teacherComments: {
           type: String,
           default: "",
           required: false
         },	
-//14        
+//15        
 adminComments: {
           type: String,
           default: "",
           required: false
-        }	
+        }
   
 });
 //This is where we can change the table/collection name
