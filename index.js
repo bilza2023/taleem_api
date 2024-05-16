@@ -40,7 +40,6 @@ const uploadImageToSpace = async (file, tcode) => {
 };
 
 ////////////////////////////////////////////////////////////
-const { getTcode, registerTcode } = require('./dbLayer');
 const command = require('./command.js');
 
 const signup = require('./controllers/signup.js')
@@ -149,20 +148,7 @@ app.post("/command", async function (req, res) {
 });
 ///////////////////////////////////////////////////////////////////////
 db.once('open', () => {
-  // debugger;
   console.log("MongoDb ===> connection established")
-  registerTcode([
-    "fbise9math",
-    "fbise10math",
-
-    "fbise9english",
-    "fbise10english",
-
-    "matrices",
-
-    "fbise9math2024"
-]);
-
   app.listen(PORT, () => { console.log(`listening on port ${PORT}`) });
 });
 ///////////////////////////////////////////////////////////////////////

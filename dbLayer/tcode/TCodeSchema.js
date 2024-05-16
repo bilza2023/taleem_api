@@ -27,7 +27,7 @@ const SlidesSchema = require('./slidesSchema');
 ///////////////////////////////////////////
 const TCodeSchema = new Schema({
 
-//1        
+//1     tcode = table code ===>>> category    
 tcode: {
         type: String,
         default: "general",

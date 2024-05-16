@@ -9,18 +9,23 @@
  * 5- I have decided to keep debugging-mode/non-debugging-mode out of this level (on top). This means that tcode_module is always in debugging mode and it is the api on top (Taleem_Api) to decide to expose it or not. From here we are sending all errors using "error"
  */
 // const mongoose = require("mongoose");
-const prepResp = require('./fn/prepResp');
+// const prepResp = require('./fn/prepResp');
+const mongoose = require('mongoose');
 const getFilename = require('./fn/getFilename');
 
+const TCodeSchema = require('./TCodeSchema');
 
+// const TCodeModel = mongoose.model('TCode', TCodeSchema, "database");
+const TCodeModel = mongoose.model('TCode', TCodeSchema, "database");
+ 
 class TCode {
-  constructor(model) {
-    this.model = model;
-  }
- mongooseModel(){
-  return this.model;
- }
- async getSyllabus() {
+  static model = TCodeModel;
+
+  static mongooseModel() {
+    return this.model;
+  } 
+ 
+  static async getSyllabus() {
   try {
     // Attempt to fetch syllabus data from the database
     const syllabus = await this.model.find({}).select({
@@ -42,21 +47,16 @@ class TCode {
       throw error;
     }
 }
-async get(data) { //id
+static async get(data) { //id
   try {
     const item = await this.model.findById(data.id).lean();
-
-    // if (item == null) {
-    //   throw new Error(`Could not find the question`); 
-    // } else {
       return {item};
-    // }
   } catch (error) {
       throw error;
   }
 }
 
-async update(data) {
+static async update(data) {
   try {
 
     // new: true mean return the new document and not the old one
@@ -69,9 +69,12 @@ async update(data) {
   }
 }
 
-async create(data) {
+static async create(data) {
   try {
+    debugger;
     getFilename(data.question, data.tcode);
+    ///--must insert tcode into question
+    data.question.tcode = data.tcode;
     const newQuestion = new this.model(data.question);
     const item = await newQuestion.save();
     return { item };
@@ -82,7 +85,7 @@ async create(data) {
 }
 
 ///////////////////////////////
-async where(data = {query:{}}) {
+static async where(data = {query:{}}) {
   try {
     const items = await this.model.find(data.query);
     return { items };
@@ -92,7 +95,7 @@ async where(data = {query:{}}) {
 }
 
 //////////////////////////
-async count(data = {query:{}}) {
+static async count(data = {query:{}}) {
   try {
     const items = await this.model.countDocuments(data.query);
     return { items };
@@ -102,7 +105,7 @@ async count(data = {query:{}}) {
 }
 
 //////////////////////////
-async delete(data) {
+static async delete(data) {
   try {
    debugger;
     const item = await this.model.findById(data.id).lean();
@@ -123,7 +126,7 @@ async delete(data) {
   }
 }
  
-async getUniqueChapters() {
+static async getUniqueChapters() {
   try {
     const chapters = await this.model.aggregate([
       {
@@ -153,7 +156,7 @@ async getUniqueChapters() {
   }
 }
 
-async getUniqueExercises() {
+static async getUniqueExercises() {
   try {
     const exercises = await this.model.aggregate([
       {
@@ -183,7 +186,7 @@ async getUniqueExercises() {
   }
 }
 
-async getByStatus(data= {status: "final"}) {
+static async getByStatus(data= {status: "final"}) {
   try {
     const items = await this.model.find({ status: data.status });
 
@@ -192,7 +195,7 @@ async getByStatus(data= {status: "final"}) {
     throw error;
   }
 }
-async getByFilename(data = {filename:""}) {
+static async getByFilename(data = {filename:""}) {
   try {
     const item = await this.model.findOne({ filename : data.filename }).lean();
 
@@ -206,7 +209,7 @@ async getByFilename(data = {filename:""}) {
   }
 }
 
-async getByQuestionType( data= {questionType: "free"} ) {
+static async getByQuestionType( data= {questionType: "free"} ) {
   try {
     if (!['free', 'paid', 'other'].includes(data.questionType)) {
       throw new Error("Invalid question type provided");
@@ -221,7 +224,7 @@ async getByQuestionType( data= {questionType: "free"} ) {
 }
 
 
-async getChapter(data) {
+static async getChapter(data) {
   try {
     if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
@@ -233,7 +236,7 @@ async getChapter(data) {
   }
 }
 
-async getExercise(data) {
+static async getExercise(data) {
   try {
     if (typeof data.exerciseName !== 'string' || data.exerciseName.trim() === '') {
       throw new Error("Invalid exercise name provided");
@@ -247,7 +250,7 @@ async getExercise(data) {
 
 //////////////////////////////////////////////////////
 
-async chapterMap() {
+static async chapterMap() {
   try {
     const chapterMap = [];
 
@@ -270,7 +273,7 @@ async chapterMap() {
     throw error;
   }
 }
-async getExerciseByChapter(data) {
+static async getExerciseByChapter(data) {
   try {
     if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
@@ -287,7 +290,7 @@ async getExerciseByChapter(data) {
   }
 }
 
-async getChapterSyllabus(data) {
+static async getChapterSyllabus(data) {
   try {
     if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
@@ -311,7 +314,7 @@ async getChapterSyllabus(data) {
   }
 }
 
-async getExerciseByChapterSyllabus(data) {
+static async getExerciseByChapterSyllabus(data) {
   try {
     if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {
       throw new Error("Invalid chapter number provided");
@@ -339,7 +342,7 @@ async getExerciseByChapterSyllabus(data) {
 }
 
 
-async slidesState(data) {
+static async slidesState(data) {
   try {
     // Validate the chapterNumber and exerciseName inputs
     if (typeof data.chapterNumber !== 'number' || isNaN(data.chapterNumber)) {

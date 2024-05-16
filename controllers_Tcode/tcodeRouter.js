@@ -1,18 +1,19 @@
 require('dotenv').config(); 
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 
 const TcodeRouter = express.Router();
-const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
+// const TCodeSchema = require('../dbLayer/tcode/TCodeSchema');
 
+const TCode = require('../dbLayer/tcode/TCode');
 
 const getIncomming = require('../fn/getIncomming');
-const getMdl = require('../fn/getMdl');
+// const getMdl = require('../fn/getMdl');
 const finalJson = require('../fn/finalJson');
 
-const {getTcode} = require('../dbLayer');
+// const {getTcode} = require('../dbLayer');
 const syllabus = require('./syllabus');
 const deleteFn = require('./deleteFn');
 
@@ -21,12 +22,13 @@ TcodeRouter.post("/get" , async function(req,res) {
     try{ debugger;
     // accept tcode,id return question
   //////////////////===> check incomming -1 <======/////////////////////////////
-    const data = await getIncomming(req,["id","tcode"]);
-    await getMdl(data);
+    const data = await getIncomming(req,["id"]);
+    // await getMdl(data);
     //////////////////===> The Process-2 <======//////////////////////////////////
     //TCode is not used here since it is simple.
-    const mongoose_mdl =  mongoose.model(data.tcode, TCodeSchema);
-    const question = await mongoose_mdl.findById(data.id.toString()).lean();
+
+    const question =  await TCode.get(data);
+    // const question = await mongoose_mdl.findById(data.id.toString()).lean();
   //////////////////===> final json-3 <======//////////////////////////////////
       return finalJson({question},['question'],res);
     // }
@@ -82,18 +84,19 @@ TcodeRouter.post("/create" , async function(req,res) {
       // if(!verifyResp.ok){
       // return res.status(400).json({message:verifyResp.message})
       // }/////////////////////////////////////
-  const question = req.body.question;
+  const data = {};    
+  data.question = req.body.question;
   // const id  = presentation._id;
-  const tcode  = req.body.tcode;
+  data.tcode  = req.body.tcode;
   
-  if (!question || !tcode) {return  res.status(400).json({ message: "missing data" }); }
+  if (!data.question || !data.tcode) {return  res.status(400).json({ message: "missing data" }); }
   
-  const theMdl = await getTcode(tcode);
+  // const theMdl = await getTcode(tcode);
   // const theMdl = await getModel(tcode);
-  if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
+  // if(!theMdl) { return res.status(404).json({ ok:false, message: "tcode not found" });}
 
   /////////////////////////////////////////////////////////////////////////
-  const result = await theMdl.addQuestion(tcode,question);
+  const result = await TCode.create(data);
   if(result.ok){
       return res.status(200).json(result);
     }else {
