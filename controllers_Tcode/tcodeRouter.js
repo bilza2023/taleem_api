@@ -145,6 +145,24 @@ TcodeRouter.post("/getUniqueExercises" , async function(req,res) {
   }
 });
 ////////////////////////////////////////////////////////
+TcodeRouter.post("/getByFilename" , async function(req,res) {
+ try{
+  debugger;
+  const data = await getIncomming(req,["tcode" , "filename"]);
+  
+   /////////////////////////////////////////////////////////////////////////
+   const item = await TCode.mongooseModel().findOne({ "tcode": data.tcode, "filename": data.filename });
+
+   if(item){
+       return res.status(200).json({item});
+     }else {
+       return res.status(500).json({ ok:false, message: 'failed' });
+     }
+     /////////////////////////////////////////////////////////////////////////
+  }catch(e){
+    return res.status(500).json({ ok:false, message: 'failed' });
+  }
+});
 TcodeRouter.post("/getByStatus" , async function(req,res) {
  try{
   debugger;

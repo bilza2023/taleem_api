@@ -76,7 +76,7 @@ questionType:{
 status:{
 	  type: String ,
 	  required:true , 
-    enum: ['empty' ,'fill' ,'locked', 'final'],
+    enum: ['empty' ,'filled' ,'fill','locked', 'final'],
     required: true,
     default : 'empty'
 	  },

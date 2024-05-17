@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 
 const db = require("./mongoDb/mongo.js");
 const TCodeSchema = require("./dbLayer/tcode/TCodeSchema.js");
-const Fbise9Math = mongoose.model('fbise9math', TCodeSchema);
+// const Fbise10maths = mongoose.model('fbise10math', TCodeSchema,"fbise10maths");
+const Fbise9math = mongoose.model('fbise9math', TCodeSchema,"fbise9maths");
+
+const Database = mongoose.model('database', TCodeSchema, 'database');
 
 ///////////////////////////////////////////////////////////////////////
 db.once('open', async () => {
@@ -14,16 +17,23 @@ db.once('open', async () => {
 ///////////////////////////////////////////////////////////////////////
 async function run() {
     try {
-        const result = await Fbise9Math.updateMany(
-            {}, // Update all documents in the collection
-            { $set: { "sortOrder": 99 } } // Set "sortOrder" to 99 for all documents
-        );
+        // const result = await Database.deleteMany({ tcode: 'fbise9mathOld' });
+        // console.log("Documents deleted:", result.deletedCount);
+    
+        const documents = await Fbise9math.find({});
 
-        console.log("Number of documents updated:", result.nModified);
-        // Find all documents in the "fbise9math" collection
-        // const documents = await Fbise9Math.find({});
+        for (let i = 0; i < documents.length; i++) {
+            const doc = documents[i].toObject();
+            
+            delete doc._id; // Remove the _id field to avoid conflicts
+            delete doc.__v; // Remove the __v field to avoid version conflicts
 
-        // console.log("All documents from 'fbise9math' collection:", documents);
+            // save each doc to Database
+            const newDoc = new Database(doc);
+            await newDoc.save();
+
+            console.log(`${i} :`, newDoc._id);
+        }
     } catch (error) {
         console.error("Error reading documents:", error);
     } finally {
