@@ -7,7 +7,7 @@ const multer = require('multer');
 const AWS = require('aws-sdk');
 
 
-const db = require("./mongoDb/mongo.js");
+const db = require("./dbLayer/mongo.js");
 const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // Allow files up to 10MB in size
@@ -40,13 +40,11 @@ const uploadImageToSpace = async (file, tcode) => {
 };
 
 ////////////////////////////////////////////////////////////
-const command = require('./command.js');
-
 const signup = require('./controllers/signup.js')
 const login = require('./controllers/login.js')
 const change_password = require('./controllers/change_password.js')
 /////////////////////////////////////////////----->>>>
-const tcodeRouter = require('./controllers_Tcode/tcodeRouter.js');
+const tcodeRouter = require('./dbLayer/tcodeRouter.js');
 ////////////////////////////////////////////////
 const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 5000;
@@ -142,10 +140,7 @@ app.post('/upload_image', upload.single('image'), async (req, res) => {
   }
 });
 
-//////////////////////////////////////////////////////////////
-app.post("/command", async function (req, res) {
-  return await command(req, res);
-});
+
 ///////////////////////////////////////////////////////////////////////
 db.once('open', () => {
   console.log("MongoDb ===> connection established")

@@ -1,5 +1,5 @@
 
-const TaleemError = require('../fn/taleemError');
+const TaleemError = require('./taleemError');
 
 
 async function getIncomming(req, args = []) {

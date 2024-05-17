@@ -5,13 +5,10 @@ const express = require('express');
 const getFilename = require('../dbLayer/tcode/fn/getFilename');
 
 const TcodeRouter = express.Router();
-
 const TCode = require('../dbLayer/tcode/TCode');
 
-const getIncomming = require('../fn/getIncomming');
-const finalJson = require('../fn/finalJson');
-
-// const deleteFn = require('./deleteFn');
+const getIncomming = require('./getIncomming');
+const finalJson = require('./finalJson');
 
 ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/create" , async function(req,res) {
@@ -38,7 +35,6 @@ TcodeRouter.post("/create" , async function(req,res) {
     return res.status(400).json({message: errorMessage });
   }
 });
-
 ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/get" , async function(req,res) {
     try{ 
@@ -257,7 +253,6 @@ TcodeRouter.post("/delete" , async function(req,res) {
       return res.status(200).json({ok:false, message : "failed to get  a delete result" });
      }
 });
-
 ////////////////////////////////////////////////////////
 module.exports = TcodeRouter;
 ////////////////////////////////////////////////////////
