@@ -5,12 +5,15 @@ const jwt = require('jsonwebtoken');
 // const sendGmail = require("./gmail.js");
 // const send_Forget_Password_Gmail = require("./forget_password_gmail.js");
 const { v4: uuid } = require('uuid');
-const {getUser} = require('../dbLayer');
 
+const mongoose = require('mongoose');
+const UserSchema = require('../dbLayer/user/UserSchema');
+const Student = mongoose.model('Student', UserSchema, "users");
+ 
 
 async function login(req, res) {
     try {
-        debugger;
+        // debugger;
         const email = req.body.email;
         const passwordPlain = req.body.password;
         // Input validation
@@ -18,7 +21,6 @@ async function login(req, res) {
           return res.status(400).json({ message: "Email and password are required" });
         }
         //////*********************************************** */
-        const Student = getUser().mongooseModel();
         //////*********************************************** */
        //-check if the user exists
         const user = await Student.findOne({ email });
