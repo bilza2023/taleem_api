@@ -54,6 +54,11 @@ const SlidesSchema = new Schema({
 	type:String ,
 	required:false ,
 	},
+    soundFileType:{ 
+	type:String ,
+	required:true ,
+	defualt : "opus"
+	},
     template:{ 
 	type:String ,
 	required:false ,
