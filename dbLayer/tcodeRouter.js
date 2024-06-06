@@ -12,8 +12,8 @@ const finalJson = require('./finalJson');
 
 ///////////////////////////////////////////////////////////////////////
 TcodeRouter.post("/create" , async function(req,res) {
-  try {
-    debugger;
+  try { 
+    // debugger;
     //--> question must have tcode
     const data = await getIncomming(req,["question"]);
     getFilename(data.question   ,  data.question.tcode);

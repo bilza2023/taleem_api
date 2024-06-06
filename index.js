@@ -54,7 +54,7 @@ const app = express()
 app.use(cookieParser());
 //..
 const corsOptions = {
-  origin: ['https://backoffice-navy.vercel.app', 'http://localhost:5173'],
+  origin: ['https://backoffice-navy.vercel.app', 'http://localhost:5173' , 'https://taleem.help'],
   methods: 'POST', // Specify the allowed HTTP methods, e.g., 'GET', 'POST', 'PUT', etc.
   allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
 };
@@ -85,16 +85,16 @@ app.get('/', async (req, res) => {
   res.status(200).json({ success: true, message: "Welcome to Taleem API" });
 });
 ////////////////////////////////////////////////////////
-// const mp3_exists = async (params) => {
-//   try {
-//     debugger;
-//     const data = await s3.listObjectsV2(params).promise();
-//     return data.Contents.map((obj) => obj.Key);
-//   } catch (error) {
-//     console.error('Error listing objects:', error);
-//     throw error;
-//   }
-// };
+const mp3_exists = async (params) => {
+  try {
+    debugger;
+    const data = await s3.listObjectsV2(params).promise();
+    return data.Contents.map((obj) => obj.Key);
+  } catch (error) {
+    console.error('Error listing objects:', error);
+    throw error;
+  }
+};
 
 app.post('/upload_mp3', upload.single('mp3'), async (req, res) => {
 

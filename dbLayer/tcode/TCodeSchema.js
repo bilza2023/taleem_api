@@ -20,6 +20,7 @@ const SlidesSchema = require('./slidesSchema');
  13 : sortOrder         : Number, 0
  14 : teacherComments   : String, ""
  15 : adminComments     : String, ""
+ 16 : soundFileType     : String, 'opus
 
  // for now removed "version" we will see when required, replaced it with "tags"
  // also removed "schemaType" since this is the only schema I have we will se if required but for now this creates confusion.
@@ -114,6 +115,12 @@ adminComments: {
           type: String,
           default: "",
           required: false
+        },
+//16        
+soundFileType: {
+          type: String,
+          default: "opus",
+          required: true
         }
   
 });
