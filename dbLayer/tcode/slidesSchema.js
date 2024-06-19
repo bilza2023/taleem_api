@@ -83,4 +83,4 @@ const SlidesSchema = new Schema({
 });
 
 
-module.exports = SlidesSchema;
+module.exports = {ItemSchema,SlidesSchema};

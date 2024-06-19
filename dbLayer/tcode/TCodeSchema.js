@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const SlidesSchema = require('./slidesSchema');
+const {SlidesSchema} = require('./slidesSchema');
 /**
  =========================== TcodeSchema =======================
  1:  tcode **REQUIRED : String, "general"       

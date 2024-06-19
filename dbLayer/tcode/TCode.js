@@ -30,6 +30,7 @@ class TCode {
         chapter: 1,
         exercise: 1,
         name: 1,
+        tcode: 1,
         part: 1,
         questionNo: 1,
         questionType: 1,

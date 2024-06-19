@@ -40,6 +40,7 @@ const uploadImageToSpace = async (file, tcode) => {
 };
 
 ////////////////////////////////////////////////////////////
+const GroupRouter = require('./dbLayer/groupRouter.js')
 const signup = require('./controllers/signup.js')
 const login = require('./controllers/login.js')
 const change_password = require('./controllers/change_password.js')
@@ -64,6 +65,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //.. Route middlewares--/////////////////////////////////////
 app.use("/tcode", tcodeRouter);
+app.use("/group", GroupRouter);
 
 ///////////////////////////Routes////////////////////////
 app.post('/signup', async (req, res) => {

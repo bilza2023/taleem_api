@@ -143,7 +143,7 @@ TcodeRouter.post("/getUniqueExercises" , async function(req,res) {
 ////////////////////////////////////////////////////////
 TcodeRouter.post("/getByFilename" , async function(req,res) {
  try{
-  debugger;
+  // debugger;
   const data = await getIncomming(req,["tcode" , "filename"]);
   
    /////////////////////////////////////////////////////////////////////////
