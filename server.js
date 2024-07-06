@@ -23,7 +23,7 @@ async function run() {
             const doc = documents[i];
             const updatedDoc = await Database.findOneAndUpdate(
                 { _id: doc._id }, 
-                { $set: { soundFileType: 'mp3' } }, 
+                { $set: { status: 'empty' } }, 
                 { new: true }
             );
             console.log(`${i} : ${updatedDoc._id}`);
