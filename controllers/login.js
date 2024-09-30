@@ -1,49 +1,48 @@
 require('dotenv').config();
-// const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// const sendGmail = require("./gmail.js");
-// const send_Forget_Password_Gmail = require("./forget_password_gmail.js");
-const { v4: uuid } = require('uuid');
-
-const mongoose = require('mongoose');
-const UserSchema = require('../dbLayer/user/UserSchema');
-const Student = mongoose.model('Student', UserSchema, "users");
- 
+const Student = require('../schemas/User');
 
 async function login(req, res) {
     try {
-        // debugger;
-        const email = req.body.email;
-        const passwordPlain = req.body.password;
+        const { email, password: passwordPlain } = req.body;
+
         // Input validation
         if (!email || !passwordPlain) {
-          return res.status(400).json({ message: "Email and password are required" });
+            return res.status(400).json({ ok: false, message: "Email and password are required" });
         }
-        //////*********************************************** */
-        //////*********************************************** */
-       //-check if the user exists
+
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ ok: false, message: "Invalid email format" });
+        }
+
+        // Check if the user exists
         const user = await Student.findOne({ email });
-        if (user == null) {
-          return res.status(404).json({ message: "Email address not found" });
+        if (!user) {
+            return res.status(404).json({ ok: false, message: "Email address not found" });
         }
-    //--disable for now    
-        // if (user.verified == false) {
-        //   return res.status(404).json({ message: "Your account is not verified",errorcode: "AccountNotVerified" });
+
+        // Uncomment this block when email verification is implemented
+        // if (!user.verified) {
+        //     return res.status(403).json({ ok: false, message: "Your account is not verified", errorCode: "AccountNotVerified" });
         // }
-        // encrypt incomming password to compare
-      if ( bcrypt.compare(passwordPlain, user.password)) {
-            const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: "365d" });
-    
-          res.set("Authorization", `Bearer ${token}`);
-          return res.status(200).json({ok:true, message: "Login successful", token: token ,email});
-      } else {
-          return res.status(401).json({  message: "Invalid email or password" });
-      }
-      
-      } catch (error) {
-        return res.status(500).json({  message: "Login failed", error });
-      }
-  }
- 
-  module.exports = login;
+
+        // Compare passwords
+        const isPasswordValid = await bcrypt.compare(passwordPlain, user.password);
+        if (isPasswordValid) {
+            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "365d" });
+
+            res.set("Authorization", `Bearer ${token}`);
+            return res.status(200).json({ ok: true, message: "Login successful", token, email });
+        } else {
+            return res.status(401).json({ ok: false, message: "Invalid email or password" });
+        }
+    } catch (error) {
+        console.error("Login error:", error);
+        return res.status(500).json({ ok: false, message: "Login failed", error: error.message });
+    }
+}
+
+module.exports = login;

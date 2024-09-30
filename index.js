@@ -14,36 +14,11 @@ const upload = multer({
   },
 });
 
-const s3 = new AWS.S3({
-  accessKeyId: 'DO002RJ3BRP3TMKZCG9G',
-  secretAccessKey: 'GrBzXEa3ssjmCVy6M6t5tBiXprXnjXH5GNEh+rjlBns',
-  endpoint: 'http://blr1.digitaloceanspaces.com',
-});
-
-const uploadImageToSpace = async (file, tcode) => {
-  const params = {
-    Bucket: 'taleem-media',
-    Key: `images/${tcode}/${file.originalname}`, // Change the key as per your requirement
-    Body: file.buffer,
-    ACL: 'public-read',
-    ContentType: 'image/jpeg', // Change content type if not JPEG
-  };
-
-  try {
-    const data = await s3.upload(params).promise();
-    // console.log('Image upload successful:', data.Location);
-    return data.Location;
-  } catch (error) {
-    // console.error('Error uploading image:', error);
-    throw error;
-  }
-};
-
 ////////////////////////////////////////////////////////////
-const GroupRouter = require('./dbLayer/groupRouter.js')
+// const GroupRouter = require('./dbLayer/groupRouter.js')
 const signup = require('./controllers/signup.js')
 const login = require('./controllers/login.js')
-const change_password = require('./controllers/change_password.js')
+// const change_password = require('./controllers/change_password.js')
 /////////////////////////////////////////////----->>>>
 const tcodeRouter = require('./dbLayer/tcodeRouter.js');
 ////////////////////////////////////////////////
@@ -65,16 +40,16 @@ app.use(express.urlencoded({ extended: true }));
 
 //.. Route middlewares--/////////////////////////////////////
 app.use("/tcode", tcodeRouter);
-app.use("/group", GroupRouter);
+// app.use("/group", GroupRouter);
 
 ///////////////////////////Routes////////////////////////
 app.post('/signup', async (req, res) => {
-  debugger;
+  // debugger;
   return signup(req, res);
 });
 ///////////////////////////Routes////////////////////////
 app.post('/login', async (req, res) => {
-  debugger;
+  // debugger;
   return login(req, res);
 });
 ///////////////////////////Routes////////////////////////

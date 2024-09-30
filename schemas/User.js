@@ -52,7 +52,6 @@ role : { // Board name, can be one of the specified values
 name: {
         type: String,
         required: false,
-        unique: true
         },
 verified: { 
         type: Boolean,
@@ -68,6 +67,19 @@ createdAt: {
         required: true,
         default: Date.now
         },
+verifiedAt: { 
+        type: Date,
+        required: false,
+        },
+lastLoginDate: { 
+        type: Date,
+        required: false,
+        },
+notifications: {
+        type: [String],
+        required: true,
+        default : []
+        },
 purchases: {
         type: [purchasesSchema],
         required: true,
@@ -79,5 +91,5 @@ description: {
         }
 });
 
-module.exports = UserSchema;
-
+const User = mongoose.model('User', UserSchema);
+module.exports = User;
