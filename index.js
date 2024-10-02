@@ -1,128 +1,90 @@
 require('dotenv').config();
-
-const express = require('express');
+const db = require("./mongo.js");
+const mongoose = require('mongoose');
 const cors = require('cors');
+const express = require('express');
+const RestfulExpressRouter = require('restful_express_router'); 
+const jwt = require('jsonwebtoken');
+const login = require('./middleware/login.js');
 
-const multer = require('multer');
-const AWS = require('aws-sdk');
-
-
-const db = require("./dbLayer/mongo.js");
-const upload = multer({
-  limits: {
-    fileSize: 10 * 1024 * 1024, // Allow files up to 10MB in size
-  },
-});
-
-////////////////////////////////////////////////////////////
-// const GroupRouter = require('./dbLayer/groupRouter.js')
-const signup = require('./controllers/signup.js')
-const login = require('./controllers/login.js')
-// const change_password = require('./controllers/change_password.js')
-/////////////////////////////////////////////----->>>>
-const tcodeRouter = require('./dbLayer/tcodeRouter.js');
-////////////////////////////////////////////////
+const User = require('./schemas/User.js');
+const Tcode = require('./schemas/TCode.js');
+const SlideTemplate = require('./schemas/slideTemplate.js');
 const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 5000;
-////////////////////////////////////////////////////
-// debugger;
-const app = express()
-app.use(cookieParser());
-//..
+//////////////////////////////
+const app = express();
+app.use(cookieParser())
+app.use(express.json());
 const corsOptions = {
   origin: ['https://backoffice-navy.vercel.app', 'http://localhost:5173' , 'https://taleem.help'],
   methods: 'POST', // Specify the allowed HTTP methods, e.g., 'GET', 'POST', 'PUT', etc.
   allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
 };
 app.use(cors('*', corsOptions)); //working
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-//.. Route middlewares--/////////////////////////////////////
-app.use("/tcode", tcodeRouter);
-// app.use("/group", GroupRouter);
-
-///////////////////////////Routes////////////////////////
-app.post('/signup', async (req, res) => {
+//========================================Middlewhere
+const logRequest = (req, res, next) => {
   // debugger;
-  return signup(req, res);
-});
-///////////////////////////Routes////////////////////////
-app.post('/login', async (req, res) => {
-  // debugger;
-  return login(req, res);
-});
-///////////////////////////Routes////////////////////////
-// app.post('/change_password',async (req,res)=>{
-//     debugger;
-//     return change_password(req,res);
-// });
-///////////////////////////Routes////////////////////////
-app.get('/', async (req, res) => {
-  res.status(200).json({ success: true, message: "Welcome to Taleem API" });
-});
-////////////////////////////////////////////////////////
-const mp3_exists = async (params) => {
-  try {
-    debugger;
-    const data = await s3.listObjectsV2(params).promise();
-    return data.Contents.map((obj) => obj.Key);
-  } catch (error) {
-    console.error('Error listing objects:', error);
-    throw error;
-  }
+  console.log(`Request Method: ${req.method}, URL: ${req.url}`);
+  next(); // Proceed to the next middleware or route handler
 };
 
-app.post('/upload_mp3', upload.single('mp3'), async (req, res) => {
 
-  try {
-    const mp3File = req.file;
-    const tcode = req.body.tcode;
-    const exercise = req.body.exercise;
-
-    if (!mp3File || !tcode || !exercise) {
-      return res.status(400).json({ success: false, message: 'No MP3 file or relevant data uploaded' });
+// Middleware  for Auth
+const authenticateJWT = (req, res, next) => {
+  debugger;
+    const token = req.headers['authorization']?.split(' ')[1]; 
+    if (!token) {
+        return res.sendStatus(403); // Forbidden if no token
     }
 
-    ///////////////////////////////////////////////////
-    const params = {
-      Bucket: 'taleem-media',
-      Key: `mp3/${tcode}/${exercise}/${mp3File.originalname}`,
-      Body: mp3File.buffer,
-      ACL: 'public-read',
-      ContentType: 'audio/mpeg',
-    };
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+          console.log(`Verified: ${req.method}, URL: ${req.url}`);
+            return res.sendStatus(403); // Forbidden if token is not valid
+        }
+        
+        req.user = user; // Save user info in request object
+        next(); // Proceed to the next middleware or route handler
+    });
+};
 
-    const data = await s3.upload(params).promise();
-    res.status(200).json({ success: true, message: 'MP3 file uploaded successfully' });
+///////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////
-  } catch (error) {
-    res.status(500).json({ success: true, message: 'Failed to upload' });
-  }
-});
+let restfulExpressRouter = new RestfulExpressRouter(User);
 
-app.post('/upload_image', upload.single('image'), async (req, res) => {
-  try {
-    const file = req.file;
-    const tcode = req.body.tcode;
-    if (!file || !tcode) {
-      return res.status(400).json({ success: false, message: 'No image file (or tcode) uploaded' });
+restfulExpressRouter.middlewareForList = [logRequest];
+restfulExpressRouter.middlewareForGetById = [logRequest];
+restfulExpressRouter.middlewareForUpdate = [authenticateJWT];
+
+debugger;
+
+restfulExpressRouter.addExtraRoute(
+  {
+    method: 'post',
+    path: '/login',
+    middlewares: [], // Optional: add any middlewares
+    handler: async function(req, res) {
+      debugger;
+      const rez =  await login(req,res);
+      return rez;
+      // res.status(200).json({ message: 'This is an additional route (login)' });
     }
-    const fileUrl = await uploadImageToSpace(file, tcode);
-    res.status(200).json({ success: true, message: 'Image file uploaded successfully', url: fileUrl });
-  } catch (error) {
-    // console.error('Error uploading image:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
   }
+);
+app.use('/users', restfulExpressRouter.getRouter());
+
+
+let restfulExpressRouterTcode = new RestfulExpressRouter(Tcode);
+app.use('/tcode', restfulExpressRouterTcode.getRouter());
+
+let restfulExpressRouterslideTemplate = new RestfulExpressRouter(SlideTemplate);
+app.use('/slideTemplate', restfulExpressRouterslideTemplate.getRouter());
+
+
+app.get('/', (req, res) => res.status(200).json({ message: "Welcome to ExpressRestRouter 0.0.1" }));
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-
-///////////////////////////////////////////////////////////////////////
-db.once('open', () => {
-  console.log("MongoDb ===> connection established")
-  app.listen(PORT, () => { console.log(`listening on port ${PORT}`) });
-});
-///////////////////////////////////////////////////////////////////////
-
-module.exports = app;
