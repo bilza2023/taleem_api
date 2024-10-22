@@ -14,10 +14,9 @@ const SlideTemplateSchema = new Schema({
     required: false,
     maxlength: 500
   },
-  slides: {
-    type: [SlidesSchema],
+  slide: {
+    type: SlidesSchema,
     required: true,
-    default: []
   },
 }, { timestamps: true });
 

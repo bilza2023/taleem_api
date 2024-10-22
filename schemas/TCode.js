@@ -129,4 +129,4 @@ soundFileType: {
 
 
 const Tcode = mongoose.model('Tcode', TCodeSchema,'database');
-module.exports = Tcode;
+module.exports = {Tcode,TCodeSchema};
